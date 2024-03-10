@@ -1,13 +1,49 @@
 import React from 'react'
+import axios from 'axios';
+import {Redirect}  from 'react-router-dom';
+import { useState } from 'react';
+// import  useHistory  from 'react-router-dom';
 
 function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [error, setError] = useState('');
+  // const history = useHistory(); 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('/api/login', { email, password });
+      console.log('Login successful:', response.data);
+     
+      // Here you can redirect the user to a dashboard or another page upon successful login
+      // history.push('/');
+      setIsLoggedIn(true);
+    } catch (error) {
+    
+      console.error('Login failed:', error);
+      
+    }
+  };
+   if (isLoggedIn) {
+    // Redirect to dashboard if isLoggedIn is true
+    return <Redirect to="/login" />;
+  }
+    const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
   return (
     <div>
         <div className="font-[sans-serif] text-[#333]">
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <div className="grid md:grid-cols-1 items-center gap-4 max-w-6xl w-full p-4 m-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-md">
+        <div className="grid md:grid-cols-1 items-center gap-4 max-w-3xl w-[31rem] lg:mb-24 p-4 m-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-md">
           <div className="md:max-w-md w-full sm:px-6 py-4">
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="mb-12">
                 <h3 className="text-3xl font-extrabold">Sign in</h3>
                 <p className="text-sm mt-4 ">Don't have an account <a href="http://www.somthing.com" className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">Register here</a></p>
@@ -15,7 +51,7 @@ function Login() {
               <div>
                 <label className="text-xs block mb-2">Email</label>
                 <div className="relative flex items-center">
-                  <input name="email" type="text" required className="w-full text-sm border-b border-gray-300 focus:border-[#333] px-2 py-3 outline-none" placeholder="Enter email" />
+                  <input name="email" type="text" required value={email} onChange={handleEmailChange} className="w-full text-sm border-b border-gray-300 focus:border-[#333] px-2 py-3 outline-none" placeholder="Enter email" />
                   <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" className="w-[18px] h-[18px] absolute right-2" viewBox="0 0 682.667 682.667">
                     <defs>
                       <clipPath id="a" clipPathUnits="userSpaceOnUse">
@@ -32,7 +68,7 @@ function Login() {
               <div className="mt-8">
                 <label className="text-xs block mb-2">Password</label>
                 <div className="relative flex items-center">
-                  <input name="password" type="password" required className="w-full text-sm border-b border-gray-300 focus:border-[#333] px-2 py-3 outline-none" placeholder="Enter password" />
+                  <input name="password" type="password" required value={password} onChange={handlePasswordChange} className="w-full text-sm border-b border-gray-300 focus:border-[#333] px-2 py-3 outline-none" placeholder="Enter password" />
                   <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" className="w-[18px] h-[18px] absolute right-2 cursor-pointer" viewBox="0 0 128 128">
                     <path d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z" data-original="#000000"></path>
                   </svg>
@@ -57,11 +93,11 @@ function Login() {
                 </button>
               </div>
               <p className="my-8 text-sm text-gray-400 text-center">or continue with</p>
-              
+           
               
             </form>
           </div>
-          
+           
         </div>
       </div>
     </div>

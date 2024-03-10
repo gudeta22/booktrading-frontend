@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 
 function Navbar() {
   return (
@@ -8,8 +9,11 @@ function Navbar() {
       <a href="https://readymadeui.com/"><img src="https://readymadeui.com/readymadeui.svg" alt="logo" class='w-36' />
       </a>
       <div class='flex lg:order-1 max-sm:ml-auto'>
-        <button
+        <Link to="/login">
+          <button
           class='px-4 py-2 text-sm rounded-full font-bold text-white border-2 border-[#007bff] bg-[#007bff] transition-all ease-in-out duration-300 hover:bg-transparent hover:text-[#007bff]'>Login</button>
+        </Link>
+        
         <button
           class='px-4 py-2 text-sm rounded-full font-bold text-white border-2 border-[#007bff] bg-[#007bff] transition-all ease-in-out duration-300 hover:bg-transparent hover:text-[#007bff] ml-3'>Sign
           up</button>
