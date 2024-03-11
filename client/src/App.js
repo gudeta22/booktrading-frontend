@@ -3,6 +3,7 @@ import { Route , Routes } from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar.js";
 import Login from "./Components/login/Login.js";
 import Mainpage from './Components/mainpage/Mainpage.js'
+import Registration from "./Components/Register/Registration.js";
 
 
 
@@ -14,7 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Mainpage />}/>
         <Route path="/login" element={<Login />} />
-
+        <Route path="/register" element={<Registration />} />
       </Routes>
      
        

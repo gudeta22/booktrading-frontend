@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-const backendURL = 'http://localhost:3002';
+const backendURL = 'http://localhost:4000';
 const API_ENDPOINTS = {
   VIEW_POSTS: '/api/posts/', // Update this with your actual endpoint
 };
@@ -25,9 +25,6 @@ function Mainpage() {
 
     fetchProductData();
  } , [])
-
-
-
     return (
         <div>
             <section id='projects' className="w-fit mx-auto grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5" >
