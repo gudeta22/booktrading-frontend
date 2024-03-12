@@ -56,10 +56,10 @@ function Registration() {
       )}
       <div className="font-[sans-serif] text-[#333] relative">
         <div className="h-[240px] font-[sans-serif]"></div>
-        <div className="relative -mt-40 m-4">
+        <div className="relative -mt-40 p-10 -mx-10">
           <form
             onSubmit={handleSubmit}
-            className="bg-white max-w-xl w-[34rem] mx-auto shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] p-6 rounded-md"
+            className="bg-white max-w-xl w-[28rem] lg:w-[34rem] mx-auto shadow-2xl p-6 rounded-md"
           >
             <div className="mb-12">
               <h3 className="text-3xl font-extrabold text-center">Create an account</h3>
@@ -110,7 +110,7 @@ function Registration() {
             <div className="mt-12">
               <button
                 type="submit"
-                className="w-full shadow-xl py-2.5 px-8 text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none transition-all"
+                className="w-full shadow-xl py-2.5 px-8 text-sm font-semibold rounded-md text-white bg-black hover:bg-white hover:text-black focus:outline-none transition-all"
               >
                 Register
               </button>

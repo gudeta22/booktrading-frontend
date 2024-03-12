@@ -44,12 +44,12 @@ function Login() {
     <div>
       <div className="font-[sans-serif] text-[#333]">
         <div className="min-h-screen flex flex-col items-center justify-center">
-          <div className="grid md:grid-cols-1 items-center gap-4 max-w-3xl w-[31rem] lg:mb-24 p-4 m-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-md">
+          <div className="grid md:grid-cols-1 items-center gap-4 mb-40 max-w-3xl w-[27rem] lg:w-[30rem] lg:h-[40rem] lg:mb-24 p-4 m-4 shadow-2xl rounded-md">
             <div className="md:max-w-md w-full sm:px-6 py-4">
               <form onSubmit={handleSubmit}>
                 <div className="mb-12">
                   <h3 className="text-3xl font-extrabold">Sign in</h3>
-                  <p className="text-sm mt-4 ">Don't have an account <a href="http://www.somthing.com" className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap">Register here</a></p>
+                  <p className="text-sm mt-4 ">Don't have an account <a href="/register" className="text-black font-semibold hover:underline ml-1 whitespace-nowrap">Register here</a></p>
                 </div>
                 <div>
                   <label className="text-xs block mb-2">Email</label>
@@ -79,18 +79,18 @@ function Login() {
                 </div>
                 <div className="flex items-center justify-between gap-2 mt-5">
                   <div>
-                    <a href="jajvascript:void(0);" className="text-blue-600 font-semibold text-sm hover:underline">
+                    <a href="jajvascript:void(0);" className="text-black font-semibold text-sm hover:underline">
                       Forgot Password?
                     </a>
                   </div>
                   {error && <p className="text-red-500">{error}</p>}
                 </div>
                 <div className="mt-12">
-                  <button type="button" className="w-full shadow-xl py-2.5 px-4 text-sm font-semibold rounded-full text-white bg-blue-600 hover:bg-blue-700 focus:outline-none" onClick={handleSubmit}>
+                  <button type="button" className="w-full border shadow-xl py-2.5 px-4 text-sm font-semibold rounded-sm text-white bg-[#000] hover:bg-white hover:text-black focus:outline-none hover:border-black" onClick={handleSubmit}>
                     Login
                   </button>
                 </div>
-                <p className="my-8 text-sm text-gray-400 text-center">or continue with</p>
+                {/* <p className="my-8 text-sm text-gray-400 text-center">or continue with</p> */}
               </form>
             </div>
           </div>
