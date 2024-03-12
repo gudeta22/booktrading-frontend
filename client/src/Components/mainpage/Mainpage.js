@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Landingpage from './Landingpage';
-const backendURL = 'http://localhost:4000';
+const backendURL = 'http://localhost:4004';
 const API_ENDPOINTS = {
   VIEW_POSTS: '/api/posts/', // Update this with your actual endpoint
 };
@@ -20,7 +20,7 @@ function Mainpage() {
         } catch (error){
             console.error("error fetching product data:" , error)
 
-            alert("an error has occured while fetching data")
+            
         }
     }
 
@@ -34,7 +34,7 @@ function Mainpage() {
                 {/* Mapping product cards */}
                 {posts.length > 0 && posts.map(post => (
     <div key={post.id} className="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
-        <img src={post.image} alt='book' className="h-80 w-72 object-fit rounded-t-xl" />
+        <img src={post.image} alt='book' name='image' type="file" className="h-80 w-72 object-fit rounded-t-xl" />
         <div className="px-4 py-3 w-72">
             <p className="text-lg font-bold text-black truncate block capitalize">{post.title}</p>
             <p className="text-lg font-bold text-black truncate block capitalize">{post.author}</p>

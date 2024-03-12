@@ -7,11 +7,8 @@ function Landingpage() {
         style={{ backgroundImage: "url(https://readymadeui.com/dark-bg-image.webp)" }}>
         <div className="max-w-5xl mx-auto text-center relative px-4 sm:px-10 mt-16">
             <div className='lg:-my-16 lg:py-44'>
-                  <h1 className="lg:text-7xl md:text-6xl text-4xl  text-white font-bold mb-40 mt-16 lg:-my-16 md:!leading-[80px]">Build Landing Pages with Typeform
-            Integration</h1>
-          <h1 className="text-base text-white my-28">Embark on a gastronomic journey with our curated dishes, delivered promptly
-            to your doorstep. Elevate your dining experience today. Lorem ipsum dolor sit amet, consectetur adipiscing
-            elit.</h1>
+                  <h1 className="lg:text-7xl md:text-6xl text-4xl  text-white font-bold mb-40 mt-16 lg:-my-16 md:!leading-[80px]">Book Trading Website</h1>
+          <h1 className="text-base text-white my-28">At BookSwap, we believe in the magic of storytelling and the joy of sharing beloved tales with others. Our platform is more than just a book trading website; it's a community where book lovers connect, exchange, and discover new literary adventures.</h1>
             </div>
           
           <div className="grid sm:grid-cols-3 gap-6 items-center mt-16">

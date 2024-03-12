@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const backendURL = 'http://localhost:4000';
+const backendURL = 'http://localhost:4004';
 const API_ENDPOINTS = {
   REGISTER: '/api/register', // Update this with your actual endpoint
 };
