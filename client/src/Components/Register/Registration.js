@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import Navbar from '../Navbar/Navbar';
 
 const backendURL = 'http://localhost:4004';
 const API_ENDPOINTS = {
@@ -48,6 +49,8 @@ function Registration() {
   };
 
   return (
+    <>
+    <Navbar />
     <div>
       {registrationSuccess && (
         <div className="bg-green-200 text-green-800 p-3 mb-4 rounded-md text-center">
@@ -122,6 +125,7 @@ function Registration() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

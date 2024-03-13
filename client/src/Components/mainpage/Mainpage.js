@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Landingpage from "./Landingpage";
+// import Landingpage from "./Landingpage";
+// import Navbar from "../Navbar/Navbar";
 const backendURL = "http://localhost:4004";
 const API_ENDPOINTS = {
   VIEW_POSTS: "/api/posts/", // Update this with your actual endpoint
@@ -25,9 +26,10 @@ function Mainpage() {
   }, []);
   return (
     <>
-      <Landingpage />
-      <div>
+     
+      <div className="lg:-my-[60rem]">
         <section
+        
           id="projects"
           className="w-fit mx-auto grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5"
         >

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
-const backendURL = 'http://localhost:4003';
+import { useNavigate } from 'react-router-dom';
+import Navbar from '../Navbar/Navbar';
+
+const backendURL = 'http://localhost:4004';
 const API_ENDPOINTS = {
   Login: '/api/auth/login',
 };
@@ -19,7 +21,7 @@ function Login() {
     try {
       const response = await axios.post(backendURL + API_ENDPOINTS.Login, { email, password });
       console.log('Login successful:', response.data);
-      navigate('/');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);
       if (error.response && error.response.status === 401) {
@@ -34,7 +36,6 @@ function Login() {
     setEmail(e.target.value);
     setError('');
   };
-
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
     setError('');
@@ -42,6 +43,7 @@ function Login() {
 
   return (
     <div>
+      <Navbar />
       <div className="font-[sans-serif] text-[#333]">
         <div className="min-h-screen flex flex-col items-center justify-center">
           <div className="grid md:grid-cols-1 items-center gap-4 mb-40 max-w-3xl w-[27rem] lg:w-[30rem] lg:h-[40rem] lg:mb-24 p-4 m-4 shadow-2xl rounded-md">
