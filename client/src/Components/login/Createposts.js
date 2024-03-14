@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const backendURL = "http://localhost:4004";
+const backendURL = "http://localhost:4005";
 const API_ENDPOINTS = {
   CREATE_POST: "/api/posts/create",
 };
@@ -67,7 +67,7 @@ function Createposts() {
         <div className="items-center justify-center my-16 border object-fit w-[50%] mx-[31rem] p-8 shadow-xl object-fit ">
           <label
             htmlFor="dropzone-file"
-            className="flex flex-col items-center justify-center w-[30rem] h-64 border-2 lg:mx-[13rem] border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-100 dark:hover:bg-bray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+            className="flex flex-col items-center justify-center w-[30rem] h-64 border-2 lg:mx-[13rem] border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-100 dark:hover:bg-bray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-white"
           >
             
             <input

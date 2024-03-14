@@ -3,7 +3,8 @@ import Sidebar from './Sidebar'
 import Createposts from '../login/Createposts'
 import Nav from './Nav'
 import { Route, Routes } from 'react-router-dom'
-import Mainpage from '../mainpage/Mainpage'
+
+import Posts from '../mainpage/Posts'
 // import { Route  , Routes} from 'react-router-dom'
 
 
@@ -15,7 +16,7 @@ function Dashlayout() {
          <Sidebar />
           <Routes>
                 <Route path='/' element={<Createposts />} />
-                <Route path='/posts' element={<Mainpage />} />
+                <Route path='/posts' element={<Posts />} />
           </Routes>
             
        

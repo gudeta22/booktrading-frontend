@@ -7,9 +7,9 @@ function Nav() {
 
 
   return (
-    <div>
+    <div className='sticky'>
       <header
-        className="shadow-md -py-1 px-4 sm:px-10 bg-gray-100 font-[sans-serif] min-h-[70px] lg:z-50 z-50"
+        className="shadow-md sticky -py-1 px-4 sm:px-10 bg-gray-100 font-[sans-serif] min-h-[70px] lg:z-50 z-50"
       >
         <div className="flex flex-wrap items-center justify-between gap-5 relative">
           <Link to="/" className="lg:w-24">
@@ -17,13 +17,13 @@ function Nav() {
           </Link>
 
           <div className="flex lg:order-1 max-sm:ml-auto">
-            <Link to="/post">
+            <Link to="/dashboard">
               <button className="px-4 py-2 text-sm rounded font-bold text-white border-2 border-[#000] bg-[#000] transition-all ease-in-out duration-300 hover:bg-transparent hover:text-[#000]">
                 Upload Post
               </button>
             </Link>
 
-            <Link to="/posts">
+            <Link to="/dashboard/posts">
               <button className="px-4 py-2 text-sm rounded font-bold text-white border-2 border-[#000] bg-[#000] transition-all ease-in-out duration-300 hover:bg-transparent hover:text-[#000] ml-3">
                 see Posts
               </button>

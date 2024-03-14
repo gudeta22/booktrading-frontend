@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 // import Landingpage from "./Landingpage";
 // import Navbar from "../Navbar/Navbar";
-const backendURL = "http://localhost:4004";
+const backendURL = "http://localhost:4005";
 const API_ENDPOINTS = {
   VIEW_POSTS: "/api/posts/", // Update this with your actual endpoint
 };
-function Mainpage() {
+function Posts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   //useffect
@@ -85,4 +85,4 @@ function Mainpage() {
   );
 }
 
-export default Mainpage;
+export default Posts;

@@ -2,11 +2,11 @@
 import { Route , Routes } from "react-router-dom";
 // import Navbar from "./Components/Navbar/Navbar.js";
 import Login from "./Components/login/Login.js";
-import Mainpage from './Components/mainpage/Mainpage.js'
 import Registration from "./Components/Register/Registration.js";
 import Createposts from "./Components/login/Createposts.js";
 import Dashlayout from "./Components/Dashboard/Dashlayout.js";
 import Home from "./Components/mainpage/Home.js";
+import Posts from "./Components/mainpage/Posts.js";
 function App() {
   return (
     <div className="App">
@@ -25,7 +25,7 @@ function App() {
           <Route path="/dashboard" element={<Dashlayout />}>
           {/* Nested create route */}
           <Route path="/dashboard/create" element={<Createposts />} />
-          <Route path="/dashboard/posts" element={<Mainpage />} />
+          <Route path="/dashboard/posts" element={<Posts />} />
         </Route>
        
          
