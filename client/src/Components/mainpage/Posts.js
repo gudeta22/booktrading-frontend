@@ -10,18 +10,19 @@ const API_ENDPOINTS = {
 
 function Posts() {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   useEffect(() => {
     const fetchProductData = async () => {
       try {
         const response = await axios.get(backendURL + API_ENDPOINTS.VIEW_POSTS);
         setPosts(response.data);
-        setLoading(false);
+        // setLoading(false);
       } catch (error) {
         console.error("Error fetching product data:", error);
-        setLoading(false);
+        // setLoading(false);
       }
     };
 
@@ -62,10 +63,17 @@ function Posts() {
     };
   }, []);
 
+  const toggleDescription = () => {
+    setShowFullDescription(!showFullDescription);
+  };
+  const showLess = () => {
+  setShowFullDescription(false);
+};
+
   return (
     <>
-      <div className="lg:-my-[52rem]">
-        <section className="w-fit mx-auto grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5">
+      <div className="lg:-my-[52rem] flex ">
+        <section className="w-fit mx-auto grid grid-cols-1  lg:grid-cols-4 md:grid-cols-2 gap-y-20 gap-x-14 mt-10 mb-5">
           {posts.length === 0
             ? Array.from({ length: 6 }, (_, index) => (
                 <div
@@ -105,46 +113,56 @@ function Posts() {
       </div>
 
       {selectedPost && (
-        <div className="relative">
-        <div className="fixed top-0 left-0 w-full h-full  bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-8 z-50 rounded-lg shadow-lg modal-content w-[25%] h-[75%]">
-            <button
-              onClick={closeModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-            >
-              Close
-            </button>
-            <h2 className="text-xl font-bold text-gray-800">{selectedPost.title}</h2>
-            <p className="text-gray-600">{selectedPost.author}</p>
-            <img
-              src={selectedPost.image}
-              alt="book"
-              className="mt-4 h-80 w-full object-fit rounded-lg"
-            />
-            <p className="mt-4 text-gray-800">${selectedPost.price}</p>
-            
-            {/* Description space */}
-            {/* <p className="mt-4 text-gray-800">{selectedPost.description}</p> */}
-             <div class="p-4 md:p-5 space-y-4">
-                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    With less than a month to go before the European Union enacts new consumer privacy laws for its citizens, companies around the world are updating their terms of service agreements to comply.
-                </p>
-                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on May 25 and is meant to ensure a common set of data rights in the European Union. It requires organizations to notify users as soon as possible of high-risk data breaches that could personally affect them.
-                </p>
-            </div>
-
-            {/* Render delete button only if a post is selected */}
-            <div className="flex justify-end mt-4">
-              <Trash2
-                onClick={() => handleDeletePost(selectedPost.id)}
-                className="text-red-600 font-bold cursor-pointer"
-              />
-            </div>
-          </div>
-        </div>
-        </div>
+  <div className="relative">
+    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-8 z-50 rounded-lg shadow-lg modal-content w-[25%] h-[75%] overflow-y-auto">
+      
+      
+        <img
+          src={selectedPost.image}
+          alt="book"
+          className="mt-4 h-80 w-full object-fit rounded-lg"
+        />
+          <h2 className="text-xl font-bold text-gray-800">{selectedPost.title}</h2>
+        <p className="text-gray-600">{selectedPost.author}</p>
+        <p className="mt-4 text-gray-800">${selectedPost.price}</p>
+        
+        {/* Description space */}
+<div className="mt-4 text-gray-800">
+  {selectedPost.content && (
+    <>
+      {showFullDescription || selectedPost.content.length <= 200 ? (
+        selectedPost.content // Show full content or content with length less than or equal to 200
+      ) : (
+        <>
+          {selectedPost.content.substring(0, 200)}
+          <button onClick={toggleDescription} className="text-blue-500 hover:underline focus:outline-none">
+            ...See more
+          </button>
+        </>
       )}
+      {showFullDescription && (
+        <button onClick={showLess} className="text-blue-500 hover:underline focus:outline-none">
+          Show less
+        </button>
+      )}
+    </>
+  )}
+</div>
+
+        {/* Render delete button only if a post is selected */}
+        <div className="flex justify-end mt-4">
+          <Trash2
+            onClick={() => handleDeletePost(selectedPost.id)}
+            className="text-red-600 font-bold cursor-pointer"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+   
     </>
   );
 }
