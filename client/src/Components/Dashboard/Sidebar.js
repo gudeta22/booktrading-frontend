@@ -26,7 +26,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="h-screen sticky bg-gray-100 text-black w-64 flex flex-col top-0 left-0 overflow-y-auto shadow-xl">
+    <div className="h-screen sticky py-24 bg-gray-100 text-black w-64 flex flex-col top-0 left-0 overflow-y-auto shadow-xl">
       <div className="flex-grow">
         <nav className="mt-4">
           <Link to="/" className="block py-2 px-4 flex items-center border">
