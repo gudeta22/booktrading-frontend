@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../Navbar/Navbar';
 
-const backendURL = 'http://localhost:4008';
+const backendURL = 'http://localhost:4011';
 const API_ENDPOINTS = {
   REGISTER: '/api/register', // Update this with your actual endpoint
 };
@@ -21,14 +21,17 @@ function Registration() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const response = await axios.post(backendURL + API_ENDPOINTS.REGISTER, {
-        fullName: formData.fullName,
-        email: formData.email,
-        password: formData.password
-      });
+  try {
+    const response = await axios.post(backendURL + API_ENDPOINTS.REGISTER, {
+      fullName: formData.fullName,
+      email: formData.email,
+      password: formData.password
+    });
+    
+    // Check if response is defined and has a data property
+    if (response && response.data) {
       console.log('Registration successful:', response.data);
       setRegistrationSuccess(true); // Set registration success to true
 
@@ -37,16 +40,25 @@ function Registration() {
         setRegistrationSuccess(false);
       }, 3000);
 
-      // Optionally, you can reset the form fields after successful registration
+      // Optionally, reset the form fields after successful registration
       setFormData({
         fullName: '',
         email: '',
         password: ''
       });
-    } catch (error) {
-      console.error('Registration error:', error.response.data);
+    } else {
+      console.error('Unexpected response:', response);
     }
-  };
+  } catch (error) {
+    // Check if error.response is defined and has a data property
+    if (error.response && error.response.data) {
+      console.error('Registration error:', error.response.data);
+    } else {
+      console.error('Unexpected error:', error.message);
+    }
+  }
+};
+
 
   return (
     <>

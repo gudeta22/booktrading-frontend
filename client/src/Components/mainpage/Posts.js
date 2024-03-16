@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Trash2 } from "react-feather";
 
-const backendURL = "http://localhost:4009";
+const backendURL = "http://localhost:4011";
 const API_ENDPOINTS = {
   VIEW_POSTS: "/api/posts/",
   DELETE_POSTS: "/api/posts/delete",
@@ -114,8 +114,8 @@ function Posts() {
 
       {selectedPost && (
   <div className="relative">
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-8 z-50 rounded-lg shadow-lg modal-content w-[25%] h-[75%] overflow-y-auto">
+    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 flex justify-center items-center">
+      <div className="bg-white p-8 z-50 rounded-lg shadow-lg modal-content w-[26%] h-[75%] overflow-y-auto">
       
       
         <img
