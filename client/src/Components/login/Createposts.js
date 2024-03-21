@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 // import { Delete } from "react-feather";
 
-const backendURL = "http://localhost:4001";
+const backendURL = "http://localhost:4002";
 const API_ENDPOINTS = {
   CREATE_POST: "/api/posts/create",
 };
