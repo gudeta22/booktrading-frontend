@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import Navbar from '../Navbar/Navbar';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import Navbar from "../Navbar/Navbar.js";
 
-const backendURL = 'http://localhost:4002';
+const backendURL = "http://localhost:4002";
 const API_ENDPOINTS = {
-  REGISTER: '/api/register', // Update this with your actual endpoint
+  REGISTER: "/api/register", // Update this with your actual endpoint
 };
 
 function Registration() {
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: ''
+    fullName: "",
+    email: "",
+    password: "",
   });
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
@@ -21,122 +21,130 @@ function Registration() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await axios.post(backendURL + API_ENDPOINTS.REGISTER, {
-      fullName: formData.fullName,
-      email: formData.email,
-      password: formData.password
-    });
-    
-    // Check if response is defined and has a data property
-    if (response && response.data) {
-      console.log('Registration successful:', response.data);
-      setRegistrationSuccess(true); // Set registration success to true
-
-      // Hide the success message after 3 seconds
-      setTimeout(() => {
-        setRegistrationSuccess(false);
-      }, 3000);
-
-      // Optionally, reset the form fields after successful registration
-      setFormData({
-        fullName: '',
-        email: '',
-        password: ''
+    try {
+      const response = await axios.post(backendURL + API_ENDPOINTS.REGISTER, {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
       });
-    } else {
-      console.error('Unexpected response:', response);
-    }
-  } catch (error) {
-    // Check if error.response is defined and has a data property
-    if (error.response && error.response.data) {
-      console.error('Registration error:', error.response.data);
-    } else {
-      console.error('Unexpected error:', error.message);
-    }
-  }
-};
 
+      // Check if response is defined and has a data property
+      if (response && response.data) {
+        console.log("Registration successful:", response.data);
+        setRegistrationSuccess(true); // Set registration success to true
+
+        // Hide the success message after 3 seconds
+        setTimeout(() => {
+          setRegistrationSuccess(false);
+        }, 3000);
+
+        // Optionally, reset the form fields after successful registration
+        setFormData({
+          fullName: "",
+          email: "",
+          password: "",
+        });
+      } else {
+        console.error("Unexpected response:", response);
+      }
+    } catch (error) {
+      // Check if error.response is defined and has a data property
+      if (error.response && error.response.data) {
+        console.error("Registration error:", error.response.data);
+      } else {
+        console.error("Unexpected error:", error.message);
+      }
+    }
+  };
 
   return (
     <>
-    <Navbar />
-    <div>
-      {registrationSuccess && (
-        <div className="bg-green-200 text-green-800 p-3 mb-4 rounded-md text-center">
-          Registration successful! Please proceed to login.
-        </div>
-      )}
-      <div className="font-[sans-serif] text-[#333] relative">
-        <div className="h-[240px] font-[sans-serif]"></div>
-        <div className="relative -mt-40 p-10 -mx-10">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white max-w-xl w-[28rem] lg:w-[34rem] mx-auto shadow-2xl p-6 rounded-md"
-          >
-            <div className="mb-12">
-              <h3 className="text-3xl font-extrabold text-center">Create an account</h3>
-            </div>
-            <div>
-              <label className="text-xs block mb-2">Full Name</label>
-              <div className="relative flex items-center">
-                <input
-                  name="fullName"
-                  type="text"
-                  required
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="w-full bg-transparent text-sm border-b border-gray-300 focus:border-blue-500 px-2 py-3 outline-none"
-                  placeholder="Enter name"
-                />
+      <Navbar />
+      <div>
+        {registrationSuccess && (
+          <div className="relative">
+          <div className="bg-green-200 fixed w-[20%] mx-[48rem] text-green-800 p-3 mb-4 rounded-md text-center">
+            Registration successful! Please proceed to login.
+          </div>
+          </div>
+        )}
+        <div className="font-[sans-serif] text-[#333] relative">
+          <div className="h-[240px] font-[sans-serif]"></div>
+          <div className="relative -mt-40 p-10 -mx-10">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white max-w-xl w-[28rem] lg:w-[34rem] mx-auto shadow-2xl p-6 rounded-md"
+            >
+              <div className="mb-12">
+                <h3 className="text-3xl font-extrabold text-center">
+                  Create an account
+                </h3>
               </div>
-            </div>
-            <div className="mt-10">
-              <label className="text-xs block mb-2">Email</label>
-              <div className="relative flex items-center">
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full bg-transparent text-sm border-b border-gray-300 focus:border-blue-500 px-2 py-3 outline-none"
-                  placeholder="Enter email"
-                />
+              <div>
+                <label className="text-xs block mb-2">Full Name</label>
+                <div className="relative flex items-center">
+                  <input
+                    name="fullName"
+                    type="text"
+                    required
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    className="w-full bg-transparent text-sm border-b border-gray-300 focus:border-blue-500 px-2 py-3 outline-none"
+                    placeholder="Enter name"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="mt-10">
-              <label className="text-xs block mb-2">Password</label>
-              <div className="relative flex items-center">
-                <input
-                  name="password"
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full bg-transparent text-sm border-b border-gray-300 focus:border-blue-500 px-2 py-3 outline-none"
-                  placeholder="Enter password"
-                />
+              <div className="mt-10">
+                <label className="text-xs block mb-2">Email</label>
+                <div className="relative flex items-center">
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full bg-transparent text-sm border-b border-gray-300 focus:border-blue-500 px-2 py-3 outline-none"
+                    placeholder="Enter email"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex items-center mt-8"></div>
-            <div className="mt-12">
-              <button
-                type="submit"
-                className="w-full shadow-xl py-2.5 px-8 text-sm font-semibold rounded-md text-white bg-black hover:bg-white hover:text-black focus:outline-none transition-all"
-              >
-                Register
-              </button>
-              <Link to="/login" className="text-blue-500 font-semibold hover:underline ml-1">
-                <p className="text-sm mt-8 text-center">Already have an account? login here</p>
-              </Link>
-            </div>
-          </form>
+              <div className="mt-10">
+                <label className="text-xs block mb-2">Password</label>
+                <div className="relative flex items-center">
+                  <input
+                    name="password"
+                    type="password"
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full bg-transparent text-sm border-b border-gray-300 focus:border-blue-500 px-2 py-3 outline-none"
+                    placeholder="Enter password"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center mt-8"></div>
+              <div className="mt-12">
+                <button
+                  type="submit"
+                  className="w-full shadow-xl py-2.5 px-8 text-sm font-semibold rounded-md text-white bg-black hover:bg-white hover:text-black focus:outline-none transition-all"
+                >
+                  Register
+                </button>
+                <Link
+                  to="/login"
+                  className="text-blue-500 font-semibold hover:underline ml-1"
+                >
+                  <p className="text-sm mt-8 text-center">
+                    Already have an account? login here
+                  </p>
+                </Link>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }
