@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar/Navbar';
 
@@ -13,8 +12,9 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication state
+
   const navigate = useNavigate();
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +22,11 @@ function Login() {
     try {
       const response = await axios.post(backendURL + API_ENDPOINTS.Login, { email, password });
       console.log('Login successful:', response.data);
+      localStorage.setItem('isAuthenticated', 'true');
+    setIsAuthenticated(true); // Set authentication state to true
+
       navigate('/dashboard');
+
     } catch (error) {
       console.error('Login failed:', error);
       if (error.response && error.response.status === 401) {
@@ -37,10 +41,15 @@ function Login() {
     setEmail(e.target.value);
     setError('');
   };
+
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
     setError('');
   };
+   if (isAuthenticated) {
+    navigate('/dashboard'); // Redirect to dashboard if already authenticated
+  }
+
 
   return (
     <div>
@@ -64,7 +73,7 @@ function Login() {
                           <path d="M0 512h512V0H0Z" data-original="#000000"></path>
                         </clipPath>
                       </defs>
-                      <g clip-path="url(#a)" transform="matrix(1.33 0 0 -1.33 0 682.667)">
+                      <g clipPath="url(#a)" transform="matrix(1.33 0 0 -1.33 0 682.667)">
                         <path fill="none" stroke-miterlimit="10" stroke-width="40" d="M452 444H60c-22.091 0-40-17.909-40-40v-39.446l212.127-157.782c14.17-10.54 33.576-10.54 47.746 0L492 364.554V404c0 22.091-17.909 40-40 40Z" data-original="#000000"></path>
                         <path d="M472 274.9V107.999c0-11.027-8.972-20-20-20H60c-11.028 0-20 8.973-20 20V274.9L0 304.652V107.999c0-33.084 26.916-60 60-60h392c33.084 0 60 26.916 60 60v196.653Z" data-original="#000000"></path>
                       </g>
@@ -93,7 +102,6 @@ function Login() {
                     Login
                   </button>
                 </div>
-                {/* <p className="my-8 text-sm text-gray-400 text-center">or continue with</p> */}
               </form>
             </div>
           </div>
