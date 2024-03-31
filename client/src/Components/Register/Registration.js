@@ -15,6 +15,7 @@ function Registration() {
     password: "",
   });
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -50,15 +51,17 @@ function Registration() {
         console.error("Unexpected response:", response);
       }
     } catch (error) {
-      // Check if error.response is defined and has a data property
       if (error.response && error.response.data) {
-        console.error("Registration error:", error.response.data);
+        if (error.response.data.message === "Email already exists") {
+          setErrorMessage("Email already exists. Please use a different email.");
+        } else {
+          console.error("Registration error:", error.response.data);
+        }
       } else {
         console.error("Unexpected error:", error.message);
       }
     }
   };
-
   return (
     <>
       <Navbar />
@@ -68,6 +71,13 @@ function Registration() {
           <div className="bg-green-200 fixed w-[20%] mx-[48rem] text-green-800 p-3 mb-4 rounded-md text-center">
             Registration successful! Please proceed to login.
           </div>
+          </div>
+        )}
+           {errorMessage && (
+          <div className="relative">
+            <div className="bg-red-200 fixed w-[20%] mx-[48rem] text-red-800 p-3 mb-4 rounded-md text-center">
+              {errorMessage}
+            </div>
           </div>
         )}
         <div className="font-[sans-serif] text-[#333] relative">
