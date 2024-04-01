@@ -10,11 +10,9 @@ import Posts from "./Components/mainpage/Posts.js";
 function App() {
   return (
     <div className="App">
-      
       <Routes>
-        <Route>
-          
-        </Route>
+       
+    
          <Route path="/" element={<Home />} />
         
         <Route path="/login" element={<Login />} />
