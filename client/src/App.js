@@ -1,6 +1,5 @@
 // import { BrowserRouter as Routes, Route } from 'react-router-dom'
-import { Route , Routes } from "react-router-dom";
-// import Navbar from "./Components/Navbar/Navbar.js";
+import { Route, Routes } from "react-router-dom";
 import Login from "./Components/login/Login.js";
 import Registration from "./Components/Register/Registration.js";
 import Createposts from "./Components/login/Createposts.js";
@@ -11,26 +10,16 @@ function App() {
   return (
     <div className="App">
       <Routes>
-       
-    
-         <Route path="/" element={<Home />} />
-        
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-         {/* <Route path="/create" element={<Createposts />} /> */}
         <Route path="/register" element={<Registration />} />
-        {/* Dashboard route */}
         <Route>
           <Route path="/dashboard" element={<Dashlayout />}>
-          {/* Nested create route */}
-          <Route path="/dashboard/create" element={<Createposts />} />
-          <Route path="/dashboard/posts" element={<Posts />} />
-        </Route>
-       
-         
+            <Route path="/dashboard/create" element={<Createposts />} />
+            <Route path="/dashboard/posts" element={<Posts />} />
+          </Route>
         </Route>
       </Routes>
-     
-       
     </div>
   );
 }

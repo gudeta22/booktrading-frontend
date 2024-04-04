@@ -1,21 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState  } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar/Navbar';
 
 const backendURL = 'http://localhost:4002';
 const API_ENDPOINTS = {
-  Login: '/api/auth/login',
-};
-
+  Login: '/api/auth/login',             
+}; 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication state
 
-  const navigate = useNavigate();
-
+  const navigate = useNavigate();                         
+                                          
   const handleSubmit = async (e) => {
     e.preventDefault();
 
