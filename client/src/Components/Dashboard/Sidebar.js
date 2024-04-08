@@ -1,27 +1,36 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from "react-router-dom";
 import { LogOut, Home, FilePlus, Eye } from 'react-feather';
+import axios from 'axios';
 
-const backendURL = 'http://localhost:4005'; // Replace with your actual backend URL
-
+const backendURL = 'http://localhost:4002';
+const API_ENDPOINTS = {
+  Logout: '/api/auth/logout',             
+}; 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${backendURL}/logout`, {
-        method: 'POST',
-        credentials: 'same-origin', // Include cookies in the request
+      const response = await axios.post(backendURL + API_ENDPOINTS.Logout, null, {
+        
       });
-      if (response.ok) {
-        // Redirect to login page or do any other action upon successful logout
-        window.location.href = '/login'; // Redirect to login page
+
+      if (response.status === 200) {
+        navigate("/login");
       } else {
-        // Handle error
-        console.error('Logout failed:', response.statusText);
+        console.error('Logout failed with status:', response.status);
         alert('Logout failed. Please try again.');
       }
     } catch (error) {
       console.error('Error during logout:', error);
-      alert('An error occurred during logout. Please try again.');
+
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+      }
+
+      
     }
   };
 

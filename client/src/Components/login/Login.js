@@ -8,6 +8,8 @@ const API_ENDPOINTS = {
   Login: '/api/auth/login',             
 }; 
 function Login() {
+
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -21,11 +23,11 @@ function Login() {
     try {
       const response = await axios.post(backendURL + API_ENDPOINTS.Login, { email, password });
       console.log('Login successful:', response.data);
-      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('isAuthenticated', email);
     setIsAuthenticated(true); // Set authentication state to true
 
-      navigate('/dashboard');
-
+      navigate('/dashboard');  
+                                  
     } catch (error) {
       console.error('Login failed:', error);
       if (error.response && error.response.status === 401) {
@@ -49,7 +51,6 @@ function Login() {
     navigate('/dashboard'); // Redirect to dashboard if already authenticated
   }
 
-
   return (
     <div>
       <Navbar />
@@ -57,11 +58,11 @@ function Login() {
         <div className="min-h-screen flex flex-col items-center justify-center">
           <div className="grid md:grid-cols-1 items-center gap-4 mb-40 max-w-3xl w-[27rem] lg:w-[30rem] lg:h-[40rem] lg:mb-24 p-4 m-4 shadow-2xl rounded-md">
             <div className="md:max-w-md w-full sm:px-6 py-4">
-              <form onSubmit={handleSubmit}>
+              <form  onSubmit={handleSubmit}>
                 <div className="mb-12">
                   <h3 className="text-3xl font-extrabold">Sign in</h3>
                   <p className="text-sm mt-4 ">Don't have an account <a href="/register" className="text-black font-semibold hover:underline ml-1 whitespace-nowrap">Register here</a></p>
-                </div>
+                </div>                                       
                 <div>
                   <label className="text-xs block mb-2">Email</label>
                   <div className="relative flex items-center">
