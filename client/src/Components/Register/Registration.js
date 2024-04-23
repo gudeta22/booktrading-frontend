@@ -19,6 +19,7 @@ function Registration() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrorMessage(""); // Clear error message on change
   };
 
   const handleSubmit = async (e) => {
@@ -31,17 +32,14 @@ function Registration() {
         password: formData.password,
       });
 
-      // Check if response is defined and has a data property
       if (response && response.data) {
         console.log("Registration successful:", response.data);
-        setRegistrationSuccess(true); // Set registration success to true
+        setRegistrationSuccess(true);
 
-        // Hide the success message after 3 seconds
         setTimeout(() => {
           setRegistrationSuccess(false);
         }, 3000);
 
-        // Optionally, reset the form fields after successful registration
         setFormData({
           fullName: "",
           email: "",
@@ -49,6 +47,7 @@ function Registration() {
         });
       } else {
         console.error("Unexpected response:", response);
+        setErrorMessage("Registration failed. Please try again.");
       }
     } catch (error) {
       if (error.response && error.response.data) {
@@ -56,24 +55,27 @@ function Registration() {
           setErrorMessage("Email already exists. Please use a different email.");
         } else {
           console.error("Registration error:", error.response.data);
+          setErrorMessage("Registration failed. Please try again.");
         }
       } else {
         console.error("Unexpected error:", error.message);
+        setErrorMessage("Registration failed. Please try again.");
       }
     }
   };
+
   return (
     <>
       <Navbar />
       <div>
         {registrationSuccess && (
           <div className="relative">
-          <div className="bg-green-200 fixed w-[20%] mx-[48rem] text-green-800 p-3 mb-4 rounded-md text-center">
-            Registration successful! Please proceed to login.
-          </div>
+            <div className="bg-green-200 fixed w-[20%] mx-[48rem] text-green-800 p-3 mb-4 rounded-md text-center">
+              Registration successful! Please proceed to login.
+            </div>
           </div>
         )}
-           {errorMessage && (
+        {errorMessage && (
           <div className="relative">
             <div className="bg-red-200 fixed w-[20%] mx-[48rem] text-red-800 p-3 mb-4 rounded-md text-center">
               {errorMessage}
