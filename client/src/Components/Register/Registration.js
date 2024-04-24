@@ -47,12 +47,14 @@ function Registration() {
         });
       } else {
         console.error("Unexpected response:", response);
-        setErrorMessage("Registration failed. Please try again.");
+        setErrorMessage("Email already exists. Please use a different email.");
       }
     } catch (error) {
       if (error.response && error.response.data) {
         if (error.response.data.message === "Email already exists") {
-          setErrorMessage("Email already exists. Please use a different email.");
+          setErrorMessage(
+            "Email already exists. Please use a different email."
+          );
         } else {
           console.error("Registration error:", error.response.data);
           setErrorMessage("Registration failed. Please try again.");
