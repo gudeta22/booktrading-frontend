@@ -7,8 +7,7 @@ function Landingpage() {
       <div class="max-w-7xl w-full mx-auto py-16">
         <div class="grid lg:grid-cols-2 justify-center items-center gap-10">
           <div>
-            <h1 class="md:text-5xl text-4xl font-extrabold mb-6 md:!leading-[55px]">Advance analysis to grow your
-              business
+            <h1 class="md:text-5xl text-4xl font-extrabold mb-6 md:!leading-[55px]">Let's Explore Books and Read For the Future of our Country
             </h1>
             <p class="text-base leading-relaxed">Unlock the potential of your business with advanced analysis tools
               that provide insightful strategies. Our cutting-edge analytics empower you to make informed decisions and
