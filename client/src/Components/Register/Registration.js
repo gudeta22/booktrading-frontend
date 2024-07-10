@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../Navbar/Navbar.js";
+import backendURL from "../../api/axios.js";
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 
-const backendURL = "http://localhost:4000";
 const API_ENDPOINTS = {
   REGISTER: "/api/register", // Update this with your actual endpoint
 };
@@ -16,14 +17,45 @@ function Registration() {
   });
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrorMessage(""); // Clear error message on change
+    if (e.target.name === "password") {
+      checkPasswordStrength(e.target.value);
+    }
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const checkPasswordStrength = (password) => {
+    let strength = "";
+    if (password.length < 6) {
+      strength = "Too short 🔴";
+    } else if (!/[A-Z]/.test(password)) {
+      strength = "Add an uppercase letter 🔵";
+    } else if (!/[0-9]/.test(password)) {
+      strength = "Add a number 🟡";
+    } else if (!/[!@#$%^&*]/.test(password)) {
+      strength = "Add a special character 🟠";
+    } else {
+      strength = "Strong password 🟢";
+    }
+    setPasswordStrength(strength);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (passwordStrength !== "Strong password 🟢") {
+      setErrorMessage("Please create a stronger password.");
+      return;
+    }
 
     try {
       const response = await axios.post(backendURL + API_ENDPOINTS.REGISTER, {
@@ -38,6 +70,7 @@ function Registration() {
 
         setTimeout(() => {
           setRegistrationSuccess(false);
+          navigate("/login"); // Redirect to login page
         }, 3000);
 
         setFormData({
@@ -57,7 +90,7 @@ function Registration() {
           );
         } else {
           console.error("Registration error:", error.response.data);
-          setErrorMessage("Registration failed. Please try again.");
+          setErrorMessage("Used an existing email. Please try again.");
         }
       } else {
         console.error("Unexpected error:", error.message);
@@ -129,14 +162,26 @@ function Registration() {
                 <div className="relative flex items-center">
                   <input
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     value={formData.password}
                     onChange={handleChange}
                     className="w-full bg-transparent text-sm border-b border-gray-300 focus:border-blue-500 px-2 py-3 outline-none"
                     placeholder="Enter password"
                   />
+                  <button
+                    type="button"
+                    onClick={toggleShowPassword}
+                    className="absolute right-2 top-4 text-xl text-gray-600 hover:text-gray-900"
+                  >
+                    {showPassword ? <AiFillEye />  :<AiFillEyeInvisible /> }
+                  </button>
                 </div>
+                {passwordStrength && (
+                  <div className="mt-2 text-xs text-gray-600">
+                    {passwordStrength}
+                  </div>
+                )}
               </div>
               <div className="flex items-center mt-8"></div>
               <div className="mt-12">
@@ -151,7 +196,7 @@ function Registration() {
                   className="text-blue-500 font-semibold hover:underline ml-1"
                 >
                   <p className="text-sm mt-8 text-center">
-                    Already have an account? login here
+                    Already have an account? Login here
                   </p>
                 </Link>
               </div>

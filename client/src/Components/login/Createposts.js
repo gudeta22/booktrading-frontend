@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
+import backendURL from "../../api/axios";
 // import { Delete } from "react-feather";
 
-const backendURL = "http://localhost:4000";
 const API_ENDPOINTS = {
   CREATE_POST: "/api/posts/create",
 };

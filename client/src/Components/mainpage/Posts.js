@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Trash2, Edit } from "react-feather";
+import backendURL from "../../api/axios";
 
-const backendURL = "http://localhost:4000";
+
 const API_ENDPOINTS = {
   VIEW_POSTS: "/api/posts/",
   DELETE_POSTS: "/api/posts/delete",

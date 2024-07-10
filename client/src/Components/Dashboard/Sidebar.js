@@ -2,8 +2,8 @@ import React from 'react';
 import { useNavigate, Link } from "react-router-dom";
 import { LogOut, Home, FilePlus, Eye } from 'react-feather';
 import axios from 'axios';
+import backendURL from '../../api/axios'
 
-const backendURL = 'http://localhost:4000';
 const API_ENDPOINTS = {
   Logout: '/api/auth/logout',             
 }; 

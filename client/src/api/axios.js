@@ -1,5 +1,3 @@
-import axios from "axios";
+const  backendURL = "http://localhost:4001";
+export default backendURL;
 
-export default axios.create({
- backendURL : "http://localhost:4000/api",
-});
