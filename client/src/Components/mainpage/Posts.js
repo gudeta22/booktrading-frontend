@@ -3,7 +3,6 @@ import axios from "axios";
 import { Trash2, Edit } from "react-feather";
 import backendURL from "../../api/axios";
 
-
 const API_ENDPOINTS = {
   VIEW_POSTS: "/api/posts/",
   DELETE_POSTS: "/api/posts/delete",
@@ -15,13 +14,15 @@ function Posts() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [editMode, setEditMode] = useState(false); // New state to toggle edit mode
+  const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     author: "",
     price: "",
     image: null,
   });
+  // const [successMessage, setSuccessMessage] = useState("");
+  // const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -40,11 +41,13 @@ function Posts() {
     try {
       await axios.delete(`${backendURL}${API_ENDPOINTS.DELETE_POSTS}/${id}`);
       setPosts(posts.filter((post) => post.id !== id));
-      console.log("Post deleted successfully");
-      closeModal(); // Close modal after deleting post
+      // setSuccessMessage("Post deleted successfully");
+      // setIsSuccessModalVisible(true);
+      closeModal();
     } catch (error) {
       console.error("Error deleting post:", error);
-      console.log("An error occurred while deleting the post");
+      // setSuccessMessage("An error occurred while deleting the post");
+      // setIsSuccessModalVisible(true);
     }
   };
 
@@ -54,55 +57,74 @@ function Posts() {
 
   const closeModal = () => {
     setSelectedPost(null);
-    setEditMode(false); // Reset edit mode when closing modal
+    setEditMode(false);
   };
 
   const toggleEditMode = () => {
-    setEditMode(!editMode); // Toggle edit mode when clicking on Edit icon
-    setFormData(selectedPost); // Set form data to current post data
+    setEditMode(!editMode);
+    setFormData(selectedPost);
   };
 
   const handleInputChange = (e) => {
     if (e.target.name === "image") {
-      setImageFile(e.target.files[0]); // Set the image file
+      setImageFile(e.target.files[0]);
     }
 
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const formDataToSend = new FormData(); // Use a different variable name here
-      formDataToSend.append("image", imageFile);
-      formDataToSend.append("title", formData.title);
-      formDataToSend.append("author", formData.author);
-      formDataToSend.append("price", formData.price);
-      const response = await axios.put(
-        `${backendURL}${API_ENDPOINTS.UPDATE_POSTS}/${selectedPost.id}`,
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      const updatedPost = response.data; // Get the updated post data from the response
-
-      const updatedPosts = posts.map((post) =>
-        post.id === selectedPost.id ? updatedPost : post
-      );
-
-      setPosts(updatedPosts);
-      setSelectedPost(updatedPost);
-      closeModal();
-      window.location.reload();
-      console.log("Post updated successfully");
-    } catch (error) {
-      console.error("Error updating post:", error);
-    }
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+   const optimisticPost = {
+    ...selectedPost,
+    title: formData.title,
+    author: formData.author,
+    price: formData.price,
+    image: imageFile ? URL.createObjectURL(imageFile) : selectedPost.image, // Use local URL for new images
   };
+
+  setPosts((prevPosts) =>
+    prevPosts.map((post) =>
+      post.id === optimisticPost.id ? optimisticPost : post
+    )
+  );
+  try {
+    const formDataToSend = new FormData();
+    formDataToSend.append("image", imageFile);
+    formDataToSend.append("title", formData.title);
+    formDataToSend.append("author", formData.author);
+    formDataToSend.append("price", formData.price);
+    
+    const response = await axios.put(
+      `${backendURL}${API_ENDPOINTS.UPDATE_POSTS}/${selectedPost.id}`,
+      formDataToSend,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    const updatedPost = response.data;
+
+    // Update the specific post in the posts array
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === updatedPost.id ? updatedPost : post
+      )
+    );
+
+    // Close modal and show success message
+    closeModal();
+    // setSuccessMessage("Post updated successfully");
+    // setIsSuccessModalVisible(true);
+  } catch (error) {
+    console.error("Error updating post:", error);
+    // setSuccessMessage("An error occurred while updating the post");
+    // setIsSuccessModalVisible(true);
+  }
+};
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -119,57 +141,67 @@ function Posts() {
     setShowFullDescription(!showFullDescription);
   };
 
-  const showLess = () => {
+  const showLess = () => { const optimisticPost = {
+    ...selectedPost,
+    title: formData.title,
+    author: formData.author,
+    price: formData.price,
+    image: imageFile ? URL.createObjectURL(imageFile) : selectedPost.image, // Use local URL for new images
+  };
+
+  setPosts((prevPosts) =>
+    prevPosts.map((post) =>
+      post.id === optimisticPost.id ? optimisticPost : post
+    )
+  );
     setShowFullDescription(false);
   };
 
   return (
     <>
-      <div className="lg:-my-[52rem] flex ">
-        <section className="w-fit mx-auto grid grid-cols-1  lg:grid-cols-4 md:grid-cols-2 gap-y-20 gap-x-14 mt-10 mb-5">
-          {posts.length === 0
-            ? Array.from({ length: 6 }, (_, index) => (
-                <div
-                  key={index}
-                  className="w-72 h-80 bg-gray-200 animate-pulse rounded-xl"
-                ></div>
-              ))
-            : posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="w-72 bg-white shadow-md rounded-xl duration-5005 hover:shadow-xl"
-                  onClick={() => openModal(post)}
-                >
-                  <img
-                    src={post.image}
-                    alt="book"
-                    name="image"
-                    type="file"
-                    className="h-80 w-72 object-fit rounded-t-xl"
-                  />
-                  <div className="px-4 py-3 w-72">
-                    <p className="text-lg  font-thin text-black truncate block capitalize">
-                      {post.title}
-                    </p>
-                    <p className="text-lg font-thin text-black truncate block capitalize">
-                      {post.author}
-                    </p>
-                    <div className="flex items-center">
-                      <p className="text-lg font-semibold text-black cursor-auto my-3">
-                        ${post.price}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-        </section>
-      </div>
+    <div className="lg:-my-[52rem] flex ">
+  <section className="w-fit mx-auto grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-y-20 gap-x-14 mt-10 mb-5">
+    {posts.length === 0
+      ? Array.from({ length: 6 }, (_, index) => (
+          <div
+            key={index}
+            className="w-72 h-80 bg-gray-200 animate-pulse rounded-xl"
+          ></div>
+        ))
+      : posts.map((post) => (
+          <div
+            key={post.id}
+            className="w-72 bg-white shadow-md rounded-xl duration-500 hover:shadow-xl"
+            onClick={() => openModal(post)}
+          >
+            <img
+              src={post.image}
+              alt="book"
+              className="h-80 w-72 object-fit rounded-t-xl"
+            />
+            <div className="px-4 py-3 w-72">
+              <p className="text-lg font-thin text-black truncate block capitalize">
+                {post.title}
+              </p>
+              <p className="text-lg font-thin text-black truncate block capitalize">
+                {post.author}
+              </p>
+              <div className="flex items-center">
+                <p className="text-lg font-semibold text-black cursor-auto my-3">
+                  ${post.price}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+  </section>
+</div>
 
       {selectedPost && (
         <div className="relative">
           <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 flex justify-center items-center">
             <div className="bg-white p-8 z-50 rounded-lg shadow-lg modal-content w-[26%] h-[75%] overflow-y-auto">
-              {editMode ? ( // Render edit form if edit mode is enabled
+              {editMode ? (
                 <>
                   <form onSubmit={handleSubmit} className="">
                     <input
@@ -207,6 +239,7 @@ function Posts() {
                     <button
                       type="submit"
                       className="bg-blue-700 m-5 text-white hover:bg-blue-800 w-24 p-2"
+
                     >
                       Save
                     </button>
@@ -275,6 +308,66 @@ function Posts() {
           </div>
         </div>
       )}
+
+      {/* {isSuccessModalVisible && (
+        <div
+          id="successModal"
+          tabIndex="-1"
+          aria-hidden="true"
+          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black bg-opacity-60"
+        >
+          <div className="relative w-full max-w-md max-h-full">
+            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-4">
+              <button
+                type="button"
+                className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
+                onClick={() => setIsSuccessModalVisible(false)}
+              >
+                <svg
+                  aria-hidden="true"
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+                <span className="sr-only">Close modal</span>
+              </button>
+              <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 p-2 flex items-center justify-center mx-auto mb-3.5">
+                <svg
+                  aria-hidden="true"
+                  className="w-8 h-8 text-green-500 dark:text-green-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+                <span className="sr-only">Success</span>
+              </div>
+              <p className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                {successMessage}
+              </p>
+              <button
+                onClick={() => setIsSuccessModalVisible(false)}
+                type="button"
+                className="py-2 px-3 text-sm font-medium text-center text-white rounded-lg bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:focus:ring-primary-900"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )} */}
     </>
   );
 }

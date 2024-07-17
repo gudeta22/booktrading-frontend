@@ -5,6 +5,7 @@ import Navbar from "../Navbar/Navbar";
 import backendURL from "../../api/axios";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useAuth } from './AuthContext'; // Import useAuth
+import { useSpring, animated } from '@react-spring/web'; // Import react-spring
 
 const API_ENDPOINTS = {
   Login: "/api/auth/login",
@@ -15,7 +16,8 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  
+  const [success, setSuccess] = useState(""); // State for success message
+
   const { login } = useAuth(); // Get login function from AuthContext
   const navigate = useNavigate();
 
@@ -31,7 +33,10 @@ function Login() {
       
       // Assuming the token is received in response.data.token
       login(response.data.token); // Call login function from AuthContext
-      navigate("/dashboard"); // Redirect to dashboard on success
+      setSuccess("Login successful! Redirecting to dashboard..."); // Set success message
+      setTimeout(() => {
+        navigate("/dashboard"); // Redirect to dashboard after a short delay
+      }, 2000); // Adjust the delay as needed
     } catch (error) {
       console.error("Login failed:", error);
       if (error.response && error.response.status === 401) {
@@ -45,22 +50,47 @@ function Login() {
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
     setError("");
+    setSuccess(""); // Clear success message when email changes
   };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
     setError("");
+    setSuccess(""); // Clear success message when password changes
   };
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
+  // Animation for success and error messages
+  const successSpring = useSpring({
+    opacity: success ? 1 : 0,
+    transform: success ? "translateY(0)" : "translateY(-20px)",
+    config: { tension: 220, friction: 12 },
+  });
+
+  const errorSpring = useSpring({
+    opacity: error ? 1 : 0,
+    transform: error ? "translateY(0)" : "translateY(-20px)",
+    config: { tension: 220, friction: 12 },
+  });
+
   return (
     <div>
       <Navbar />
-      <div className="font-[sans-serif] text-[#333]">
-        <div className="lg:my-10 flex flex-col items-center justify-center">
+      <div className="font-[sans-serif] text-[#333] relative">
+        <div className="lg:my-10 flex flex-col items-center justify-center relative">
+          {error && (
+            <animated.p style={errorSpring} className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md">
+              {error}
+            </animated.p>
+          )}
+          {success && (
+            <animated.p style={successSpring} className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-md">
+              {success}
+            </animated.p>
+          )}
           <div className="grid md:grid-cols-1 items-center gap-4 max-w-3xl w-[27rem] lg:w-[30rem] lg:h-[40rem] lg:mb-24 p-4 m-4 shadow-2xl rounded-md">
             <div className="md:max-w-md w-full sm:px-6 py-4">
               <form onSubmit={handleSubmit}>
@@ -120,7 +150,6 @@ function Login() {
                       Forgot Password?
                     </a>
                   </div>
-                  {error && <p className="text-red-500">{error}</p>}
                 </div>
                 <div className="mt-12">
                   <button
