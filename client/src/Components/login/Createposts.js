@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 import backendURL from "../../api/axios";
-// import { Delete } from "react-feather";
 
 const API_ENDPOINTS = {
   CREATE_POST: "/api/posts/create",
 };
 
-function Createposts() {
+function CreatePosts() {
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -40,7 +39,7 @@ function Createposts() {
       formDataToSend.append("author", formData.author);
       formDataToSend.append("price", formData.price);
       formDataToSend.append("image", formData.image);
-      formDataToSend.append("content", formData.content); // Add description
+      formDataToSend.append("content", formData.content);
 
       await axios.post(backendURL + API_ENDPOINTS.CREATE_POST, formDataToSend, {
         headers: {
@@ -53,13 +52,13 @@ function Createposts() {
         author: "",
         price: "",
         image: null,
-        content: "", // Reset description
+        content: "",
       });
 
       setSuccess(true);
 
       setTimeout(() => {
-        setSuccess("");
+        setSuccess(false);
       }, 3000);
     } catch (error) {
       console.error("Error submitting post:", error);
@@ -67,15 +66,12 @@ function Createposts() {
   };
 
   return (
-    <div className="lg:-my-[57rem]">
+    <div className="min-h-screen flex flex-col items-center bg-gradient-to-r from-indigo-50 to-blue-50 p-10">
       {success && (
-        <div className="relative">
-          <div
-            className="flex z-50 fixed -my-10 items-center p-3 mb-4 text-sm text-white border mx-[51rem] border-green-300 rounded-lg bg-green-500 text-green w-[14%]"
-            role="status"
-          >
+        <div className="fixed top-10 right-5 z-50 p-4 mb-4 text-sm text-white bg-green-500 border border-green-300 rounded-lg shadow-lg">
+          <div className="flex items-center">
             <svg
-              className="flex-shrink-0 inline w-4 h-4 me-3"
+              className="w-5 h-5 mr-2"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="currentColor"
@@ -83,85 +79,87 @@ function Createposts() {
             >
               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
             </svg>
-            <span className="font-medium justify-center mx-6">
-              Posted Successfully
-            </span>
+            <span className="font-medium">Post created successfully!</span>
           </div>
         </div>
       )}
-      <div className="">
-        <div className="items-center justify-center my-16 border object-fit w-[50%] mx-[31rem] p-8 shadow-xl object-fit ">
+      <div className="bg-white shadow-lg rounded-lg p-10 my-14 max-w-2xl w-full">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">
+          Create a New Post
+        </h2>
+        <div className="flex justify-center mb-6">
           <label
             htmlFor="dropzone-file"
-            className="flex flex-col items-center justify-center w-[30rem] h-64 border-2 lg:mx-[13rem] border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-100 dark:hover:bg-bray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-white"
+            className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
           >
-            <input type="file" id="dropzone-file" onChange={handleFileChange} />
-
-            {formData.image && (
+            <input
+              type="file"
+              id="dropzone-file"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            {formData.image ? (
               <img
                 src={URL.createObjectURL(formData.image)}
-                alt="Thumbnail"
-                className="w-full h-full object-contain"
+                alt="Preview"
+                className="w-full h-full object-contain rounded-md"
               />
+            ) : (
+              <div className="text-gray-500 text-center">
+                <p className="mb-2 text-sm">Drag & drop an image here</p>
+                <p className="text-xs">or click to select an image</p>
+              </div>
             )}
           </label>
-          <form className="font-[sans-serif] max-w-4xl md:mx-[13rem] my-14">
-            <div className="grid sm:grid-cols-1 gap-6">
-              <div className="relative flex items-center">
-                <input
-                  type="text"
-                  placeholder="Title"
-                  className="px-4 py-3 bg-[#f0f1f2] text-black w-[40rem] text-sm border outline-[#007bff] rounded"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="relative flex items-center">
-                <input
-                  type="text"
-                  placeholder="Author"
-                  className="px-4 py-3 bg-[#f0f1f2] text-black w-[40rem] text-sm border outline-[#007bff] rounded"
-                  name="author"
-                  value={formData.author}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="relative flex items-center">
-                <input
-                  type="number"
-                  placeholder="Price"
-                  className="px-4 py-3 bg-[#f0f1f2] text-black w-[40rem] text-sm border outline-[#007bff] rounded"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="relative flex items-center">
-                <textarea
-                  placeholder="Description"
-                  className="px-4 py-3 bg-[#f0f1f2] text-black w-[40rem] h-[100px] text-sm border outline-[#007bff] rounded"
-                  name="content"
-                  value={formData.content}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="mt-8 px-6 py-2.5 text-sm w-[10rem] font-semibold bg-[#000] hover:text-black border border-black text-white rounded hover:bg-white"
-            >
-              Submit
-            </button>
-          </form>
         </div>
+        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <input
+            type="text"
+            placeholder="Title"
+            className="w-full px-4 py-3 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Author"
+            className="w-full px-4 py-3 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            name="author"
+            value={formData.author}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="number"
+            placeholder="Price"
+            className="w-full px-4 py-3 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            required
+          />
+          <textarea
+            placeholder="Description"
+            className="w-full px-4 py-3 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 h-28"
+            name="content"
+            value={formData.content}
+            onChange={handleChange}
+            required
+          />
+        <button
+  type="button"
+  onClick={handleSubmit}
+  className="w-full py-3 bg-gradient-to-r from-indigo-700 to-indigo-900 text-white font-semibold rounded-md shadow-md hover:bg-gradient-to-r hover:indigo-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+>
+  Submit
+</button>
+
+        </form>
       </div>
     </div>
   );
 }
-export default Createposts;
+
+export default CreatePosts;

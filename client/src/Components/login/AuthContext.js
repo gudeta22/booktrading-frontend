@@ -1,24 +1,27 @@
-// AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   useEffect(() => {
-    const storedToken = localStorage.getItem("authToken");
+    const storedToken = sessionStorage.getItem("authToken");
     if (storedToken) {
       setIsAuthenticated(true);
     }
   }, []);
+
   const login = (token) => {
     setIsAuthenticated(true);
-    localStorage.setItem("authToken", token);
+    sessionStorage.setItem("authToken", token);
   };
+
   const logout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem("authToken");
+    sessionStorage.removeItem("authToken");
   };
+
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}

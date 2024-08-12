@@ -10,17 +10,14 @@ import { useSpring, animated } from '@react-spring/web'; // Import react-spring
 const API_ENDPOINTS = {
   Login: "/api/auth/login",
 };
-
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(""); // State for success message
-
   const { login } = useAuth(); // Get login function from AuthContext
   const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -64,11 +61,12 @@ function Login() {
   };
 
   // Animation for success and error messages
-  const successSpring = useSpring({
-    opacity: success ? 1 : 0,
-    transform: success ? "translateY(0)" : "translateY(-20px)",
-    config: { tension: 220, friction: 12 },
-  });
+const successSpring = useSpring({
+  opacity: success ? 1 : 0,
+  transform: success ? 'translateY(0)' : 'translateY(-20px)',
+  config: { tension: 170, friction: 26 },
+});
+
 
   const errorSpring = useSpring({
     opacity: error ? 1 : 0,

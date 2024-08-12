@@ -19,40 +19,43 @@ function Posts() {
     title: "",
     author: "",
     price: "",
+    description: "",
     image: null,
   });
-  // const [successMessage, setSuccessMessage] = useState("");
-  // const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
 
   useEffect(() => {
-    const fetchProductData = async () => {
+    const fetchPosts = async () => {
       try {
         const response = await axios.get(backendURL + API_ENDPOINTS.VIEW_POSTS);
         setPosts(response.data);
       } catch (error) {
-        console.error("Error fetching product data:", error);
+        console.error("Error fetching posts:", error);
       }
     };
 
-    fetchProductData();
+    fetchPosts();
   }, []);
 
   const handleDeletePost = async (id) => {
     try {
       await axios.delete(`${backendURL}${API_ENDPOINTS.DELETE_POSTS}/${id}`);
       setPosts(posts.filter((post) => post.id !== id));
-      // setSuccessMessage("Post deleted successfully");
-      // setIsSuccessModalVisible(true);
       closeModal();
     } catch (error) {
       console.error("Error deleting post:", error);
-      // setSuccessMessage("An error occurred while deleting the post");
-      // setIsSuccessModalVisible(true);
     }
   };
 
   const openModal = (post) => {
     setSelectedPost(post);
+    setFormData({
+      title: post.title,
+      author: post.author,
+      price: post.price,
+      description: post.description || "", // Ensure description is included
+      image: post.image,
+    });
+    setEditMode(false);
   };
 
   const closeModal = () => {
@@ -62,69 +65,50 @@ function Posts() {
 
   const toggleEditMode = () => {
     setEditMode(!editMode);
-    setFormData(selectedPost);
   };
 
   const handleInputChange = (e) => {
     if (e.target.name === "image") {
       setImageFile(e.target.files[0]);
+    } else {
+      const { name, value } = e.target;
+      setFormData({ ...formData, [name]: value });
     }
-
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-   const optimisticPost = {
-    ...selectedPost,
-    title: formData.title,
-    author: formData.author,
-    price: formData.price,
-    image: imageFile ? URL.createObjectURL(imageFile) : selectedPost.image, // Use local URL for new images
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  setPosts((prevPosts) =>
-    prevPosts.map((post) =>
-      post.id === optimisticPost.id ? optimisticPost : post
-    )
-  );
-  try {
     const formDataToSend = new FormData();
-    formDataToSend.append("image", imageFile);
+    if (imageFile) formDataToSend.append("image", imageFile);
     formDataToSend.append("title", formData.title);
     formDataToSend.append("author", formData.author);
     formDataToSend.append("price", formData.price);
-    
-    const response = await axios.put(
-      `${backendURL}${API_ENDPOINTS.UPDATE_POSTS}/${selectedPost.id}`,
-      formDataToSend,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    formDataToSend.append("description", formData.description); // Add description to FormData
 
-    const updatedPost = response.data;
+    try {
+      const response = await axios.put(
+        `${backendURL}${API_ENDPOINTS.UPDATE_POSTS}/${selectedPost.id}`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-    // Update the specific post in the posts array
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === updatedPost.id ? updatedPost : post
-      )
-    );
+      const updatedPost = response.data;
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === updatedPost.id ? updatedPost : post
+        )
+      );
+      closeModal();
+    } catch (error) {
+      console.error("Error updating post:", error);
+    }
+  };
 
-    // Close modal and show success message
-    closeModal();
-    // setSuccessMessage("Post updated successfully");
-    // setIsSuccessModalVisible(true);
-  } catch (error) {
-    console.error("Error updating post:", error);
-    // setSuccessMessage("An error occurred while updating the post");
-    // setIsSuccessModalVisible(true);
-  }
-};
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -141,234 +125,204 @@ function Posts() {
     setShowFullDescription(!showFullDescription);
   };
 
-  const showLess = () => { const optimisticPost = {
-    ...selectedPost,
-    title: formData.title,
-    author: formData.author,
-    price: formData.price,
-    image: imageFile ? URL.createObjectURL(imageFile) : selectedPost.image, // Use local URL for new images
-  };
-
-  setPosts((prevPosts) =>
-    prevPosts.map((post) =>
-      post.id === optimisticPost.id ? optimisticPost : post
-    )
-  );
+  const showLess = () => {
     setShowFullDescription(false);
   };
 
   return (
-    <>
-    <div className="lg:-my-[52rem] flex ">
-  <section className="w-fit mx-auto grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-y-20 gap-x-14 mt-10 mb-5">
-    {posts.length === 0
-      ? Array.from({ length: 6 }, (_, index) => (
-          <div
-            key={index}
-            className="w-72 h-80 bg-gray-200 animate-pulse rounded-xl"
-          ></div>
-        ))
-      : posts.map((post) => (
-          <div
-            key={post.id}
-            className="w-72 bg-white shadow-md rounded-xl duration-500 hover:shadow-xl"
-            onClick={() => openModal(post)}
-          >
-            <img
-              src={post.image}
-              alt="book"
-              className="h-80 w-72 object-fit rounded-t-xl"
-            />
-            <div className="px-4 py-3 w-72">
-              <p className="text-lg font-thin text-black truncate block capitalize">
-                {post.title}
-              </p>
-              <p className="text-lg font-thin text-black truncate block capitalize">
-                {post.author}
-              </p>
-              <div className="flex items-center">
-                <p className="text-lg font-semibold text-black cursor-auto my-3">
-                  ${post.price}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-  </section>
-</div>
+    <div className="flex min-h-screen">
+      {/* Sidebar */}
+      <aside className="w-64 bg-gray-800 text-white flex-none p-4">
+        {/* Sidebar content */}
+        <h2 className="text-xl font-semibold mb-4">Sidebar</h2>
+        {/* Add your sidebar items here */}
+      </aside>
 
-      {selectedPost && (
-        <div className="relative">
-          <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 flex justify-center items-center">
-            <div className="bg-white p-8 z-50 rounded-lg shadow-lg modal-content w-[26%] h-[75%] overflow-y-auto">
-              {editMode ? (
-                <>
-                  <form onSubmit={handleSubmit} className="">
-                    <input
-                      type="file"
-                      name="image"
-                      id="dropzone-file"
-                      onChange={handleInputChange}
-                      className="flex flex-col items-center justify-center w-[20rem] h-52 border-2 lg:mx-14 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-100 dark:hover:bg-bray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-white"
-                    />
-                    <input
-                      type="text"
-                      name="title"
-                      value={formData.title}
-                      placeholder="Title"
-                      onChange={handleInputChange}
-                      className="px-4 py-3 bg-[#f0f1f2] my-5 mx-14 text-black w-[20rem] text-sm border outline-[#007bff] rounded"
-                    />
-                    <input
-                      type="text"
-                      name="author"
-                      value={formData.author}
-                      placeholder="Author"
-                      onChange={handleInputChange}
-                      className="px-4 py-3 bg-[#f0f1f2] my-5 mx-14 text-black w-[20rem] text-sm border outline-[#007bff] rounded"
-                    />
-                    <input
-                      type="number"
-                      name="price"
-                      placeholder="Price"
-                      value={formData.price}
-                      onChange={handleInputChange}
-                      className="px-4 py-3 bg-[#f0f1f2] my-5 mx-14 text-black w-[20rem] text-sm border outline-[#007bff] rounded"
-                    />
-
-                    <button
-                      type="submit"
-                      className="bg-blue-700 m-5 text-white hover:bg-blue-800 w-24 p-2"
-
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setEditMode(false)}
-                      className="bg-red-700 text-white hover:bg-red-800 w-24 p-2"
-                    >
-                      Cancel
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <>
+      {/* Main content */}
+      <div className="flex-1 p-2 bg-gray-100">
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 my-20">
+          {posts.length === 0
+            ? Array.from({ length: 6 }, (_, index) => (
+                <div
+                  key={index}
+                  className="w-full h-80 bg-gray-300 animate-pulse rounded-lg"
+                ></div>
+              ))
+            : posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col cursor-pointer"
+                  style={{ height: '420px' }} // Fixed height
+                  onClick={() => openModal(post)}
+                >
                   <img
-                    src={selectedPost.image}
-                    alt="book"
-                    className="mt-4 h-80 w-full object-fit rounded-lg"
+                    src={post.image}
+                    alt="Post Thumbnail"
+                    className="w-full h-72 object-cover"
                   />
-                  <h2 className="text-xl font-bold text-gray-800">
-                    {selectedPost.title}
-                  </h2>
-                  <p className="text-gray-600">{selectedPost.author}</p>
-                  <p className="mt-4 text-gray-800">${selectedPost.price}</p>
-                  <div className="mt-4 text-gray-800">
-                    {selectedPost.content && (
-                      <>
-                        {showFullDescription ||
-                        selectedPost.content.length <= 200 ? (
-                          selectedPost.content
-                        ) : (
-                          <>
-                            {selectedPost.content.substring(0, 200)}
-                            <button
-                              onClick={toggleDescription}
-                              className="text-blue-500 hover:underline focus:outline-none"
-                            >
-                              ...See more
-                            </button>
-                          </>
-                        )}
-                        {showFullDescription && (
-                          <button
-                            onClick={showLess}
-                            className="text-blue-500 hover:underline focus:outline-none"
-                          >
-                            Show less
-                          </button>
-                        )}
-                      </>
-                    )}
+                  <div className="p-5 px-10 flex-1 flex flex-col">
+                    <h3 className="text-lg font-semibold text-gray-800 truncate">{post.title}</h3>
+                    <p className="text-sm text-gray-600 truncate">{post.author}</p>
+                    <p className="text-xl font-bold text-gray-800 mt-2">${post.price}</p>
                   </div>
-                </>
-              )}
+                </div>
+              ))}
+        </section>
 
-              <div className="flex justify-end mt-4">
+        {selectedPost && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+            <div className="bg-white w-full max-w-lg mx-4 rounded-lg shadow-lg overflow-hidden h-[40rem]">
+              {/* Modal Header */}
+              <div className="bg-gray-800 text-white p-4 flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Post Details</h2>
+                <button
+                  onClick={closeModal}
+                  className="text-white hover:text-gray-400"
+                >
+                  &times;
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6">
+                {editMode ? (
+                  <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 font-medium mb-2" htmlFor="image">
+                        Image
+                      </label>
+                      <input
+                        type="file"
+                        name="image"
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 font-medium mb-2" htmlFor="title">
+                        Title
+                      </label>
+                      <input
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        placeholder="Title"
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 font-medium mb-2" htmlFor="author">
+                        Author
+                      </label>
+                      <input
+                        type="text"
+                        name="author"
+                        value={formData.author}
+                        placeholder="Author"
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 font-medium mb-2" htmlFor="price">
+                        Price
+                      </label>
+                      <input
+                        type="number"
+                        name="price"
+                        value={formData.price}
+                        placeholder="Price"
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 font-medium mb-2" htmlFor="description">
+                        Description
+                      </label>
+                      <textarea
+                        name="description"
+                        value={formData.description}
+                        placeholder="Description"
+                        onChange={handleInputChange}
+                        rows="4"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="flex justify-end space-x-4">
+                      <button
+                        type="submit"
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition duration-300"
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditMode(false)}
+                        className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 transition duration-300"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <img
+                      src={selectedPost.image}
+                      alt="Post"
+                      className="w-full h-48 object-cover mb-4 rounded-md shadow-md"
+                    />
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">{selectedPost.title}</h2>
+                    <p className="text-gray-600 mb-2">{selectedPost.author}</p>
+                    <p className="text-xl font-bold text-gray-800 mb-4">${selectedPost.price}</p>
+                    <div className="text-gray-700">
+                      {selectedPost.description && (
+                        <>
+                          {showFullDescription || selectedPost.description.length <= 200 ? (
+                            selectedPost.description
+                          ) : (
+                            <>
+                              {selectedPost.description.substring(0, 200)}
+                              <button
+                                onClick={toggleDescription}
+                                className="text-blue-500 hover:underline ml-1"
+                              >
+                                ...See more
+                              </button>
+                            </>
+                          )}
+                          {showFullDescription && (
+                            <button
+                              onClick={showLess}
+                              className="text-blue-500 hover:underline ml-1"
+                            >
+                              Show less
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="bg-gray-100 p-4 border-t flex justify-end space-x-4">
                 <Edit
                   onClick={toggleEditMode}
-                  className="text-blue-600 font-bold cursor-pointer mr-4"
+                  className="text-blue-600 cursor-pointer hover:text-blue-700 transition duration-300"
                 />
                 <Trash2
                   onClick={() => handleDeletePost(selectedPost.id)}
-                  className="text-red-600 font-bold cursor-pointer"
+                  className="text-red-600 cursor-pointer hover:text-red-700 transition duration-300"
                 />
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* {isSuccessModalVisible && (
-        <div
-          id="successModal"
-          tabIndex="-1"
-          aria-hidden="true"
-          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black bg-opacity-60"
-        >
-          <div className="relative w-full max-w-md max-h-full">
-            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-4">
-              <button
-                type="button"
-                className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
-                onClick={() => setIsSuccessModalVisible(false)}
-              >
-                <svg
-                  aria-hidden="true"
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <span className="sr-only">Close modal</span>
-              </button>
-              <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 p-2 flex items-center justify-center mx-auto mb-3.5">
-                <svg
-                  aria-hidden="true"
-                  className="w-8 h-8 text-green-500 dark:text-green-400"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <span className="sr-only">Success</span>
-              </div>
-              <p className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-                {successMessage}
-              </p>
-              <button
-                onClick={() => setIsSuccessModalVisible(false)}
-                type="button"
-                className="py-2 px-3 text-sm font-medium text-center text-white rounded-lg bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:focus:ring-primary-900"
-              >
-                Continue
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
-    </>
+        )}
+      </div>
+    </div>
   );
 }
 
