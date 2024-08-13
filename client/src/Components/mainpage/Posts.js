@@ -27,6 +27,7 @@ function Posts() {
     const fetchPosts = async () => {
       try {
         const response = await axios.get(backendURL + API_ENDPOINTS.VIEW_POSTS);
+        console.log("Fetched Posts:", response.data); // Debug: Check if 'description' is present
         setPosts(response.data);
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -46,21 +47,24 @@ function Posts() {
     }
   };
 
-  const openModal = (post) => {
-    setSelectedPost(post);
-    setFormData({
-      title: post.title,
-      author: post.author,
-      price: post.price,
-      description: post.description || "", // Ensure description is included
-      image: post.image,
-    });
-    setEditMode(false);
-  };
+ const openModal = (post) => {
+  console.log("Selected Post:", post); // Check if description is present
+  setSelectedPost(post);
+  setFormData({
+    title: post.title,
+    author: post.author,
+    price: post.price,
+    description: post.description || "",
+    image: post.image,
+  });
+  setEditMode(false);
+  setShowFullDescription(false); // Reset description state
+};
 
   const closeModal = () => {
     setSelectedPost(null);
     setEditMode(false);
+    setShowFullDescription(false);
   };
 
   const toggleEditMode = () => {
@@ -68,10 +72,10 @@ function Posts() {
   };
 
   const handleInputChange = (e) => {
-    if (e.target.name === "image") {
+    const { name, value } = e.target;
+    if (name === "image") {
       setImageFile(e.target.files[0]);
     } else {
-      const { name, value } = e.target;
       setFormData({ ...formData, [name]: value });
     }
   };
@@ -84,7 +88,7 @@ function Posts() {
     formDataToSend.append("title", formData.title);
     formDataToSend.append("author", formData.author);
     formDataToSend.append("price", formData.price);
-    formDataToSend.append("description", formData.description); // Add description to FormData
+    formDataToSend.append("description", formData.description);
 
     try {
       const response = await axios.put(
@@ -133,7 +137,6 @@ function Posts() {
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <aside className="w-64 bg-gray-800 text-white flex-none p-4">
-        {/* Sidebar content */}
         <h2 className="text-xl font-semibold mb-4">Sidebar</h2>
         {/* Add your sidebar items here */}
       </aside>
@@ -152,11 +155,11 @@ function Posts() {
                 <div
                   key={post.id}
                   className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col cursor-pointer"
-                  style={{ height: '420px' }} // Fixed height
+                  style={{ height: '420px' }}
                   onClick={() => openModal(post)}
                 >
                   <img
-                    src={post.image}
+                    src={post.image || "default-image-url"} // Fallback to default image if not available
                     alt="Post Thumbnail"
                     className="w-full h-72 object-cover"
                   />
@@ -164,6 +167,25 @@ function Posts() {
                     <h3 className="text-lg font-semibold text-gray-800 truncate">{post.title}</h3>
                     <p className="text-sm text-gray-600 truncate">{post.author}</p>
                     <p className="text-xl font-bold text-gray-800 mt-2">${post.price}</p>
+                    <p className="text-gray-700 mt-2">
+                      {post.description ? (
+                        showFullDescription || post.description.length <= 100 ? (
+                          post.description
+                        ) : (
+                          <>
+                            {post.description.slice(0, 100)}...
+                            <button
+                              onClick={toggleDescription}
+                              className="text-blue-500 hover:underline ml-1"
+                            >
+                              See more
+                            </button>
+                          </>
+                        )
+                      ) : (
+                        "No description available"
+                      )}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -250,39 +272,32 @@ function Posts() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
-                    <div className="flex justify-end space-x-4">
+                    <div className="flex justify-end">
                       <button
                         type="submit"
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition duration-300"
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                       >
                         Save
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditMode(false)}
-                        className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 transition duration-300"
-                      >
-                        Cancel
                       </button>
                     </div>
                   </form>
                 ) : (
                   <>
                     <img
-                      src={selectedPost.image}
-                      alt="Post"
-                      className="w-full h-48 object-cover mb-4 rounded-md shadow-md"
+                      src={selectedPost.image || "default-image-url"}
+                      alt="Post Thumbnail"
+                      className="w-full h-72 object-cover"
                     />
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">{selectedPost.title}</h2>
-                    <p className="text-gray-600 mb-2">{selectedPost.author}</p>
-                    <p className="text-xl font-bold text-gray-800 mb-4">${selectedPost.price}</p>
-                    <div className="text-gray-700">
-                      {selectedPost.description && (
+                    <h3 className="text-xl font-semibold text-gray-800 mt-4">{selectedPost.title}</h3>
+                    <p className="text-sm text-gray-600">{selectedPost.author}</p>
+                    <p className="text-xl font-bold text-gray-800 mt-2">${selectedPost.price}</p>
+                    <div className="text-gray-700 mt-2">
+                      {selectedPost.description ? (
                         <>
                           {showFullDescription || selectedPost.description.length <= 200 ? (
-                            selectedPost.description
+                            <p>{selectedPost.description}</p>
                           ) : (
-                            <>
+                            <p>
                               {selectedPost.description.substring(0, 200)}
                               <button
                                 onClick={toggleDescription}
@@ -290,33 +305,40 @@ function Posts() {
                               >
                                 ...See more
                               </button>
-                            </>
+                            </p>
                           )}
                           {showFullDescription && (
-                            <button
-                              onClick={showLess}
-                              className="text-blue-500 hover:underline ml-1"
-                            >
-                              Show less
-                            </button>
+                            <p>
+                              {selectedPost.description}
+                              <button
+                                onClick={showLess}
+                                className="text-blue-500 hover:underline ml-1"
+                              >
+                                Show less
+                              </button>
+                            </p>
                           )}
                         </>
+                      ) : (
+                        <p>No description available</p>
                       )}
+                    </div>
+                    <div className="flex justify-end mt-4">
+                      <button
+                        onClick={toggleEditMode}
+                        className="text-blue-500 hover:underline mr-4"
+                      >
+                        <Edit className="inline mr-1" /> Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeletePost(selectedPost.id)}
+                        className="text-red-500 hover:underline"
+                      >
+                        <Trash2 className="inline mr-1" /> Delete
+                      </button>
                     </div>
                   </>
                 )}
-              </div>
-
-              {/* Modal Footer */}
-              <div className="bg-gray-100 p-4 border-t flex justify-end space-x-4">
-                <Edit
-                  onClick={toggleEditMode}
-                  className="text-blue-600 cursor-pointer hover:text-blue-700 transition duration-300"
-                />
-                <Trash2
-                  onClick={() => handleDeletePost(selectedPost.id)}
-                  className="text-red-600 cursor-pointer hover:text-red-700 transition duration-300"
-                />
               </div>
             </div>
           </div>

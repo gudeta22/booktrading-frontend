@@ -14,8 +14,9 @@ function CreatePosts() {
     image: null,
     content: "",
   });
-
+  
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const handleChange = (e) => {
     setFormData({
@@ -33,6 +34,7 @@ function CreatePosts() {
   };
 
   const handleSubmit = async () => {
+    setLoading(true); // Set loading state to true
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
@@ -62,6 +64,8 @@ function CreatePosts() {
       }, 3000);
     } catch (error) {
       console.error("Error submitting post:", error);
+    } finally {
+      setLoading(false); // Set loading state to false after submission
     }
   };
 
@@ -83,6 +87,31 @@ function CreatePosts() {
           </div>
         </div>
       )}
+      
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <div className="flex items-center">
+              <svg
+                className="w-6 h-6 mr-2 animate-spin"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v8l4 4M12 20v-8l-4-4"
+                />
+              </svg>
+              <span>Loading...</span>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="bg-white shadow-lg rounded-lg p-10 my-14 max-w-2xl w-full">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">
           Create a New Post
@@ -148,14 +177,13 @@ function CreatePosts() {
             onChange={handleChange}
             required
           />
-        <button
-  type="button"
-  onClick={handleSubmit}
-  className="w-full py-3 bg-gradient-to-r from-indigo-700 to-indigo-900 text-white font-semibold rounded-md shadow-md hover:bg-gradient-to-r hover:indigo-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
->
-  Submit
-</button>
-
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="w-full py-3 bg-gradient-to-r from-indigo-700 to-indigo-900 text-white font-semibold rounded-md shadow-md hover:bg-gradient-to-r hover:indigo-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Submit
+          </button>
         </form>
       </div>
     </div>
