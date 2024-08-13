@@ -1,4 +1,5 @@
 // App.js
+import { useState } from "react";
 import { Routes, Route } from "react-router-dom"; // Correct imports
 import { AuthProvider } from './Components/login/AuthContext.js';
 import Login from "./Components/login/Login.js";
@@ -8,8 +9,10 @@ import Dashlayout from "./Components/Dashboard/Dashlayout.js";
 import Home from "./Components/mainpage/Home.js";
 import Posts from "./Components/mainpage/Posts.js";
 import ProtectedRoute from './Components/login/ProtectRoute.js';
-
+ 
 function App() {
+
+ 
   return (
     <AuthProvider>
       <Routes>
