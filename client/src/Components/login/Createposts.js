@@ -12,6 +12,7 @@ function CreatePosts() {
     author: "",
     price: "",
     image: null,
+    pdf: null,
     content: "",
   });
   
@@ -27,9 +28,10 @@ function CreatePosts() {
 
   const handleFileChange = (e) => {
     e.preventDefault();
+    const { name, files } = e.target;
     setFormData({
       ...formData,
-      image: e.target.files[0],
+      [name]: files[0],
     });
   };
 
@@ -40,8 +42,15 @@ function CreatePosts() {
       formDataToSend.append("title", formData.title);
       formDataToSend.append("author", formData.author);
       formDataToSend.append("price", formData.price);
-      formDataToSend.append("image", formData.image);
       formDataToSend.append("content", formData.content);
+
+      if (formData.image) {
+        formDataToSend.append("image", formData.image);
+      }
+
+      if (formData.pdf) {
+        formDataToSend.append("pdf", formData.pdf);
+      }
 
       await axios.post(backendURL + API_ENDPOINTS.CREATE_POST, formDataToSend, {
         headers: {
@@ -54,6 +63,7 @@ function CreatePosts() {
         author: "",
         price: "",
         image: null,
+        pdf: null,
         content: "",
       });
 
@@ -116,27 +126,55 @@ function CreatePosts() {
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">
           Create a New Post
         </h2>
-        <div className="flex justify-center mb-6">
+        <div className="flex flex-col space-y-4 mb-6">
+          {/* Image Upload */}
           <label
-            htmlFor="dropzone-file"
+            htmlFor="image"
             className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
           >
             <input
               type="file"
-              id="dropzone-file"
+              id="image"
+              name="image"
               onChange={handleFileChange}
               className="hidden"
+              accept="image/*"
             />
             {formData.image ? (
               <img
                 src={URL.createObjectURL(formData.image)}
-                alt="Preview"
+                alt="Image Preview"
                 className="w-full h-full object-contain rounded-md"
               />
             ) : (
               <div className="text-gray-500 text-center">
                 <p className="mb-2 text-sm">Drag & drop an image here</p>
                 <p className="text-xs">or click to select an image</p>
+              </div>
+            )}
+          </label>
+
+          {/* PDF Upload */}
+          <label
+            htmlFor="pdf"
+            className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+          >
+            <input
+              type="file"
+              id="pdf"
+              name="pdf"
+              onChange={handleFileChange}
+              className="hidden"
+              accept=".pdf"
+            />
+            {formData.pdf ? (
+              <div className="text-gray-500 text-center">
+                <p className="text-sm">PDF selected: {formData.pdf.name}</p>
+              </div>
+            ) : (
+              <div className="text-gray-500 text-center">
+                <p className="mb-2 text-sm">Drag & drop a PDF here</p>
+                <p className="text-xs">or click to select a PDF</p>
               </div>
             )}
           </label>

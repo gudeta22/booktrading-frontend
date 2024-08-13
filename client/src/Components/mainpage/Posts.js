@@ -13,6 +13,7 @@ function Posts() {
   const [posts, setPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -21,6 +22,7 @@ function Posts() {
     price: "",
     content: "",
     image: null,
+    pdf: null,
   });
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -55,6 +57,7 @@ function Posts() {
       price: post.price,
       content: post.content || "",
       image: post.image,
+      pdf: post.pdf || null,
     });
     setEditMode(false);
   };
@@ -76,6 +79,7 @@ function Posts() {
       price: selectedPost.price,
       content: selectedPost.content || "",
       image: selectedPost.image,
+      pdf: selectedPost.pdf || null,
     });
     setEditMode(false);
   };
@@ -84,6 +88,8 @@ function Posts() {
     const { name, value } = e.target;
     if (name === "image") {
       setImageFile(e.target.files[0]);
+    } else if (name === "pdf") {
+      setPdfFile(e.target.files[0]);
     } else {
       setFormData((prevData) => ({ ...prevData, [name]: value }));
     }
@@ -94,14 +100,13 @@ function Posts() {
 
     const formDataToSend = new FormData();
     if (imageFile) formDataToSend.append("image", imageFile);
+    if (pdfFile) formDataToSend.append("pdf", pdfFile);
     formDataToSend.append("title", formData.title);
     formDataToSend.append("author", formData.author);
     formDataToSend.append("price", formData.price);
     formDataToSend.append("content", formData.content || "");
 
     try {
-      console.log('Submitting data:', formDataToSend);
-
       const response = await axios.put(
         `${backendURL}${API_ENDPOINTS.UPDATE_POSTS}/${selectedPost.id}`,
         formDataToSend,
@@ -111,8 +116,6 @@ function Posts() {
           },
         }
       );
-
-      console.log('Update response:', response.data);
 
       const updatedPost = response.data;
       setPosts((prevPosts) =>
@@ -206,15 +209,14 @@ function Posts() {
                       <h3 className="text-lg font-semibold text-gray-800 truncate">{post.title}</h3>
                       <p className="text-sm text-gray-600 truncate">{post.author}</p>
                       <p className="text-xl font-bold text-gray-800 mt-2">${post.price}</p>
-                      {/* Description removed from card view */}
                     </div>
                   </div>
                 ))}
           </section>
 
           {selectedPost && (
-            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-              <div className="bg-white w-full max-w-lg mx-4 rounded-lg shadow-lg overflow-hidden h-[40rem]">
+            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 ">
+              <div className="bg-white w-full max-w-lg mx-4 rounded-lg shadow-lg overflow-hidden">
                 <div className="bg-gray-800 text-white p-4 flex items-center justify-between">
                   <h2 className="text-xl font-semibold">Post Details</h2>
                   <button
@@ -235,6 +237,18 @@ function Posts() {
                         <input
                           type="file"
                           name="image"
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="pdf">
+                          PDF
+                        </label>
+                        <input
+                          type="file"
+                          name="pdf"
+                          accept=".pdf"
                           onChange={handleInputChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
@@ -288,7 +302,7 @@ function Posts() {
                           placeholder="Content"
                           onChange={handleInputChange}
                           rows="4"
-                          className="w-full px-3  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         ></textarea>
                       </div>
                       <div className="flex items-center justify-end space-x-2 -mt-2">
@@ -324,19 +338,35 @@ function Posts() {
                       >
                         {showFullDescription ? "Show Less" : "Show More"}
                       </button>
+                      {selectedPost && (
+  <div>
+    {selectedPost.pdf ? (
+      <a
+        href={`${backendURL}/${selectedPost.pdf}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-block text-blue-500 hover:underline"
+      >
+        View PDF
+      </a>
+    ) : (
+      <p>No PDF available</p>
+    )}
+  </div>
+)}
+
                       <div className="mt-6 flex items-end justify-end space-x-2">
                         <button
                           onClick={toggleEditMode}
                           className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        > <Edit className="w-4 h-4" />
-                         
+                        >
+                          <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeletePost(selectedPost.id)}
                           className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
                         >
                           <Trash2 className="w-4 h-4" />
-                          
                         </button>
                       </div>
                     </div>
