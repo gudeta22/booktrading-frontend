@@ -16,7 +16,7 @@ function CreatePosts() {
   });
   
   const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -34,7 +34,7 @@ function CreatePosts() {
   };
 
   const handleSubmit = async () => {
-    setLoading(true); // Set loading state to true
+    setLoading(true);
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
@@ -65,14 +65,14 @@ function CreatePosts() {
     } catch (error) {
       console.error("Error submitting post:", error);
     } finally {
-      setLoading(false); // Set loading state to false after submission
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-r from-indigo-50 to-blue-50 p-10">
       {success && (
-        <div className="fixed top-10 right-5 z-50 p-4 mb-4 text-sm text-white bg-green-500 border border-green-300 rounded-lg shadow-lg">
+        <div className="fixed top-10 right-5 z-50 p-4 text-sm text-white bg-green-500 border border-green-300 rounded-lg shadow-lg">
           <div className="flex items-center">
             <svg
               className="w-5 h-5 mr-2"
@@ -87,7 +87,7 @@ function CreatePosts() {
           </div>
         </div>
       )}
-      
+
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-4 rounded-lg shadow-lg">
@@ -111,7 +111,7 @@ function CreatePosts() {
           </div>
         </div>
       )}
-      
+
       <div className="bg-white shadow-lg rounded-lg p-10 my-14 max-w-2xl w-full">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">
           Create a New Post

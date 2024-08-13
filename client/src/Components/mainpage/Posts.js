@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Trash2, Edit } from "react-feather";
+import { Edit, Trash2 } from "react-feather";
 import backendURL from "../../api/axios";
 
 const API_ENDPOINTS = {
@@ -19,7 +19,7 @@ function Posts() {
     title: "",
     author: "",
     price: "",
-    description: "",
+    content: "",
     image: null,
   });
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,7 +53,7 @@ function Posts() {
       title: post.title,
       author: post.author,
       price: post.price,
-      description: post.description || "",
+      content: post.content || "",
       image: post.image,
     });
     setEditMode(false);
@@ -62,10 +62,22 @@ function Posts() {
   const closeModal = () => {
     setSelectedPost(null);
     setEditMode(false);
+    setShowFullDescription(false);
   };
 
   const toggleEditMode = () => {
-    setEditMode((prevMode) => !prevMode);
+    setEditMode(true);
+  };
+
+  const cancelEditMode = () => {
+    setFormData({
+      title: selectedPost.title,
+      author: selectedPost.author,
+      price: selectedPost.price,
+      content: selectedPost.content || "",
+      image: selectedPost.image,
+    });
+    setEditMode(false);
   };
 
   const handleInputChange = (e) => {
@@ -85,9 +97,11 @@ function Posts() {
     formDataToSend.append("title", formData.title);
     formDataToSend.append("author", formData.author);
     formDataToSend.append("price", formData.price);
-    formDataToSend.append("description", formData.description);
+    formDataToSend.append("content", formData.content || "");
 
     try {
+      console.log('Submitting data:', formDataToSend);
+
       const response = await axios.put(
         `${backendURL}${API_ENDPOINTS.UPDATE_POSTS}/${selectedPost.id}`,
         formDataToSend,
@@ -97,6 +111,8 @@ function Posts() {
           },
         }
       );
+
+      console.log('Update response:', response.data);
 
       const updatedPost = response.data;
       setPosts((prevPosts) =>
@@ -135,11 +151,9 @@ function Posts() {
       <div className="flex min-h-screen">
         <aside className="w-64 bg-gray-800 text-white flex-none p-4">
           <h2 className="text-xl font-semibold mb-4">Sidebar</h2>
-          {/* Add your sidebar items here */}
         </aside>
 
         <div className="flex-1 p-6 bg-gray-100">
-          {/* Fixed Search Input */}
           <div className="fixed w-[18rem] top-0 left-0 right-0 -mx-5 p-5 z-10 shadow-md">
             <div className="relative">
               <input
@@ -147,7 +161,7 @@ function Posts() {
                 placeholder="Search by title..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-full shadow-md  text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-full shadow-md text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                 <svg
@@ -168,7 +182,6 @@ function Posts() {
             </div>
           </div>
 
-          {/* Page Content */}
           <section className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredPosts.length === 0
               ? Array.from({ length: 6 }, (_, index) => (
@@ -193,6 +206,7 @@ function Posts() {
                       <h3 className="text-lg font-semibold text-gray-800 truncate">{post.title}</h3>
                       <p className="text-sm text-gray-600 truncate">{post.author}</p>
                       <p className="text-xl font-bold text-gray-800 mt-2">${post.price}</p>
+                      {/* Description removed from card view */}
                     </div>
                   </div>
                 ))}
@@ -211,7 +225,7 @@ function Posts() {
                   </button>
                 </div>
 
-                <div className="p-6">
+                <div className="p-6 h-auto">
                   {editMode ? (
                     <form onSubmit={handleSubmit}>
                       <div className="mb-4">
@@ -256,7 +270,7 @@ function Posts() {
                           Price
                         </label>
                         <input
-                          type="number"
+                          type="text"
                           name="price"
                           value={formData.price}
                           placeholder="Price"
@@ -265,68 +279,66 @@ function Posts() {
                         />
                       </div>
                       <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="description">
-                          Description
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="content">
+                          Content
                         </label>
                         <textarea
-                          name="description"
-                          value={formData.description}
-                          placeholder="Description"
+                          name="content"
+                          value={formData.content}
+                          placeholder="Content"
                           onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+                          rows="4"
+                          className="w-full px-3  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        ></textarea>
                       </div>
-                      <div className="flex justify-between items-center">
+                      <div className="flex items-center justify-end space-x-2 -mt-2">
+                        <button
+                          type="submit"
+                          className="bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          Save
+                        </button>
                         <button
                           type="button"
-                          onClick={toggleEditMode}
-                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                          onClick={cancelEditMode}
+                          className="bg-gray-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
                         >
-                          {editMode ? "Cancel" : "Edit"}
+                          Cancel
                         </button>
-                        {editMode && (
-                          <button
-                            type="submit"
-                            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-                          >
-                            Save
-                          </button>
-                        )}
-                        {!editMode && (
-                          <button
-                            type="button"
-                            onClick={() => handleDeletePost(selectedPost.id)}
-                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                          >
-                            <Trash2 className="inline mr-2" />
-                            Delete
-                          </button>
-                        )}
                       </div>
                     </form>
                   ) : (
                     <div>
                       <img
                         src={selectedPost.image}
-                        alt="Post"
-                        className="w-full h-48 object-cover mb-4"
+                        alt="Post Thumbnail"
+                        className="w-full h-64 object-cover rounded-lg mb-4"
                       />
-                      <h3 className="text-xl font-semibold mb-2">{selectedPost.title}</h3>
-                      <p className="text-gray-700 mb-2">By: {selectedPost.author}</p>
-                      <p className="text-gray-900 mb-2">${selectedPost.price}</p>
-                      <p className="text-gray-600">
-                        {showFullDescription
-                          ? selectedPost.description
-                          : selectedPost.description?.slice(0, 100) + "..."}
-                        {selectedPost.description?.length > 100 && (
-                          <button
-                            onClick={toggleDescription}
-                            className="text-blue-500 underline ml-2"
-                          >
-                            {showFullDescription ? "Show less" : "Read more"}
-                          </button>
-                        )}
-                      </p>
+                      <h3 className="text-xl font-semibold text-gray-800 mb-2">{selectedPost.title}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{selectedPost.author}</p>
+                      <p className="text-xl font-bold text-gray-800 mb-4">${selectedPost.price}</p>
+                      <p className="text-gray-700">{showFullDescription ? selectedPost.content : `${selectedPost.content.slice(0, 100)}...`}</p>
+                      <button
+                        onClick={toggleDescription}
+                        className="text-blue-500 hover:underline"
+                      >
+                        {showFullDescription ? "Show Less" : "Show More"}
+                      </button>
+                      <div className="mt-6 flex items-end justify-end space-x-2">
+                        <button
+                          onClick={toggleEditMode}
+                          className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        > <Edit className="w-4 h-4" />
+                         
+                        </button>
+                        <button
+                          onClick={() => handleDeletePost(selectedPost.id)}
+                          className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
