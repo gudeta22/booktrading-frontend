@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import logo from '../../assets/logo.png'
 import axios from "axios";
 import Navbar from "../Navbar/Navbar.js";
 import backendURL from "../../api/axios.js";
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { useSpring, animated } from "@react-spring/web";
 
 const API_ENDPOINTS = {
-  REGISTER: "/api/register", // Update this with your actual endpoint
+  REGISTER: "/api/register",
 };
 
 function Registration() {
@@ -99,109 +101,132 @@ function Registration() {
     }
   };
 
+  const successSpring = useSpring({
+    opacity: registrationSuccess ? 1 : 0,
+    transform: registrationSuccess ? "translateY(0)" : "translateY(-100px)",
+    config: { tension: 170, friction: 26 },
+  });
+
+  const errorSpring = useSpring({
+    opacity: errorMessage ? 1 : 0,
+    transform: errorMessage ? "translateY(0)" : "translateY(-20px)",
+    config: { tension: 220, friction: 12 },
+  });
+
   return (
     <>
-      <Navbar />
-      <div>
+      <Navbar className="fixed" />
+      <div className="font-[sans-serif]  text-[#333] -my-14  relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-200 to-purple-300">
         {registrationSuccess && (
-          <div className="relative">
-            <div className="bg-green-200 fixed w-[20%] mx-[48rem] text-green-800 p-3 mb-4 rounded-md text-center">
-              Registration successful! Please proceed to login.
+          <animated.div
+            style={successSpring}
+            className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-green-400 to-teal-500 text-white text-lg px-6 py-3 rounded-md shadow-2xl z-50 flex items-center justify-center"
+          >
+            <div className="flex items-center">
+              <div className="animate-pulse">
+                <svg
+                  className="w-6 h-6 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+              </div>
+              <span>Registration successful! Please proceed to login.</span>
             </div>
-          </div>
+          </animated.div>
         )}
         {errorMessage && (
-          <div className="relative">
-            <div className="bg-red-200 fixed w-[20%] mx-[48rem] text-red-800 p-3 mb-4 rounded-md text-center">
-              {errorMessage}
-            </div>
-          </div>
+          <animated.p
+            style={errorSpring}
+            className="fixed top-16 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded-md shadow-lg"
+          >
+            {errorMessage}
+          </animated.p>
         )}
-        <div className="font-[sans-serif] text-[#333] relative">
-          <div className="h-[240px] font-[sans-serif]"></div>
-          <div className="relative -mt-40 p-10 -mx-10">
-            <form
-              onSubmit={handleSubmit}
-              className="bg-white max-w-xl w-[28rem] lg:w-[34rem] mx-auto shadow-2xl p-6 rounded-md"
-            >
-              <div className="mb-12">
-                <h3 className="text-3xl font-extrabold text-center">
-                  Create an account
-                </h3>
-              </div>
-              <div>
-                <label className="text-xs block mb-2">Full Name</label>
-                <div className="relative flex items-center">
-                  <input
-                    name="fullName"
-                    type="text"
-                    required
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    className="w-full bg-transparent text-sm border-b border-gray-300 focus:border-blue-500 px-2 py-3 outline-none"
-                    placeholder="Enter name"
-                  />
-                </div>
-              </div>
-              <div className="mt-10">
-                <label className="text-xs block mb-2">Email</label>
-                <div className="relative flex items-center">
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full bg-transparent text-sm border-b border-gray-300 focus:border-blue-500 px-2 py-3 outline-none"
-                    placeholder="Enter email"
-                  />
-                </div>
-              </div>
-              <div className="mt-10">
-                <label className="text-xs block mb-2">Password</label>
-                <div className="relative flex items-center">
-                  <input
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-full bg-transparent text-sm border-b border-gray-300 focus:border-blue-500 px-2 py-3 outline-none"
-                    placeholder="Enter password"
-                  />
-                  <button
-                    type="button"
-                    onClick={toggleShowPassword}
-                    className="absolute right-2 top-4 text-xl text-gray-600 hover:text-gray-900"
-                  >
-                    {showPassword ? <AiFillEye />  :<AiFillEyeInvisible /> }
-                  </button>
-                </div>
-                {passwordStrength && (
-                  <div className="mt-2 text-xs text-gray-600">
-                    {passwordStrength}
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center mt-8"></div>
-              <div className="mt-12">
+        <div className="bg-white h-[44rem]  rounded-lg shadow-2xl -my-14 p-8 max-w-lg w-full mx-auto transform transition-transform duration-500">
+           <h3 className="text-4xl font-bold text-center text-gray-800 mb-8">
+            <img src={logo} alt="logo" className="w-24 mx-40" />
+          </h3>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-6">
+              <label className="text-sm font-semibold text-gray-700 block mb-2">
+                Full Name
+              </label>
+              <input
+                name="fullName"
+                type="text"
+                required
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-150"
+                placeholder="Enter your full name"
+              />
+            </div>
+            <div className="mb-6">
+              <label className="text-sm font-semibold text-gray-700 block mb-2">
+                Email
+              </label>
+              <input
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-150"
+                placeholder="Enter your email"
+              />
+            </div>
+            <div className="mb-6">
+              <label className="text-sm font-semibold text-gray-700 block mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-150"
+                  placeholder="Enter your password"
+                />
                 <button
-                  type="submit"
-                  className="w-full shadow-xl py-2.5 px-8 text-sm font-semibold rounded-md text-white bg-black hover:bg-white hover:text-black focus:outline-none transition-all"
+                  type="button"
+                  onClick={toggleShowPassword}
+                  className="absolute right-2 top-2 text-xl text-gray-500 hover:text-gray-700 transition duration-150"
                 >
-                  Register
+                  {showPassword ? <AiFillEye /> : <AiFillEyeInvisible />}
                 </button>
-                <Link
-                  to="/login"
-                  className="text-blue-500 font-semibold hover:underline ml-1"
-                >
-                  <p className="text-sm mt-8 text-center">
-                    Already have an account? Login here
-                  </p>
-                </Link>
               </div>
-            </form>
-          </div>
+              {passwordStrength && (
+                <div className="mt-2 text-xs text-gray-600">
+                  {passwordStrength}
+                </div>
+              )}
+            </div>
+            <div className="mt-8">
+              <button
+                type="submit"
+                className="w-full py-3 px-6 bg-gradient-to-r  from-indigo-700 to-indigo-900 text-white font-bold rounded-md shadow-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
+              >
+                Register
+              </button>
+              <Link
+                to="/login"
+                className="block text-center text-blue-600 font-semibold mt-4 hover:underline"
+              >
+                Already have an account? Login here
+              </Link>
+            </div>
+          </form>
         </div>
       </div>
     </>

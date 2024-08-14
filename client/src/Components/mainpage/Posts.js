@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { Edit, Trash2 } from "react-feather";
 import backendURL from "../../api/axios";
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 
 const API_ENDPOINTS = {
   VIEW_POSTS: "/api/posts/",
@@ -25,6 +28,10 @@ function Posts() {
     pdf: null,
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+  const modalRef = useRef(null);
+
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -66,6 +73,7 @@ function Posts() {
     setSelectedPost(null);
     setEditMode(false);
     setShowFullDescription(false);
+    setIsPdfModalOpen(false);
   };
 
   const toggleEditMode = () => {
@@ -107,7 +115,7 @@ function Posts() {
     formDataToSend.append("content", formData.content || "");
 
     try {
-      const response = await axios.put(
+      await axios.put(
         `${backendURL}${API_ENDPOINTS.UPDATE_POSTS}/${selectedPost.id}`,
         formDataToSend,
         {
@@ -117,29 +125,17 @@ function Posts() {
         }
       );
 
-      const updatedPost = response.data;
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === updatedPost.id ? updatedPost : post
-        )
-      );
+      const response = await axios.get(`${backendURL}${API_ENDPOINTS.VIEW_POSTS}`);
+      setPosts(response.data);
+
       closeModal();
+      setImageFile(null);
+      setPdfFile(null);
+
     } catch (error) {
       console.error("Error updating post:", error);
     }
   };
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        closeModal();
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
 
   const toggleDescription = () => {
     setShowFullDescription((prev) => !prev);
@@ -148,6 +144,23 @@ function Posts() {
   const filteredPosts = posts.filter((post) =>
     post.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const openPdfModal = () => {
+    setIsPdfModalOpen(true);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
@@ -185,7 +198,7 @@ function Posts() {
             </div>
           </div>
 
-          <section className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <section className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
             {filteredPosts.length === 0
               ? Array.from({ length: 6 }, (_, index) => (
                   <div
@@ -196,14 +209,14 @@ function Posts() {
               : filteredPosts.map((post) => (
                   <div
                     key={post.id}
-                    className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col cursor-pointer"
-                    style={{ height: '420px' }}
+                    className="bg-white shadow-lg mx-14  rounded-lg overflow-hidden flex flex-col cursor-pointer"
+                    style={{ height: '420px' , width:'320px' }}
                     onClick={() => openModal(post)}
                   >
                     <img
                       src={post.image}
                       alt="Post Thumbnail"
-                      className="w-full h-72 object-cover"
+                      className="w-full h-72 object-fit"
                     />
                     <div className="p-5 px-10 flex-1 flex flex-col">
                       <h3 className="text-lg font-semibold text-gray-800 truncate">{post.title}</h3>
@@ -215,44 +228,34 @@ function Posts() {
           </section>
 
           {selectedPost && (
-            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 ">
-              <div className="bg-white w-full max-w-lg mx-4 rounded-lg shadow-lg overflow-hidden">
+            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+              <div
+                ref={modalRef}
+                className="bg-white w-full max-w-lg mx-4 rounded-lg shadow-lg overflow-hidden"
+              >
                 <div className="bg-gray-800 text-white p-4 flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">Post Details</h2>
-                  <button
-                    onClick={closeModal}
-                    className="text-white hover:text-gray-400"
-                  >
-                    &times;
+                  <h2 className="text-lg font-semibold">{selectedPost.title}</h2>
+                  <button onClick={closeModal}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
                   </button>
                 </div>
 
-                <div className="p-6 h-auto">
+                <div className="p-4">
                   {editMode ? (
                     <form onSubmit={handleSubmit}>
-                      <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="image">
-                          Image
-                        </label>
-                        <input
-                          type="file"
-                          name="image"
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <label className="block text-gray-700 font-medium mb-2" htmlFor="pdf">
-                          PDF
-                        </label>
-                        <input
-                          type="file"
-                          name="pdf"
-                          accept=".pdf"
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
                       <div className="mb-4">
                         <label className="block text-gray-700 font-medium mb-2" htmlFor="title">
                           Title
@@ -261,7 +264,6 @@ function Posts() {
                           type="text"
                           name="title"
                           value={formData.title}
-                          placeholder="Title"
                           onChange={handleInputChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
@@ -274,7 +276,6 @@ function Posts() {
                           type="text"
                           name="author"
                           value={formData.author}
-                          placeholder="Author"
                           onChange={handleInputChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
@@ -284,10 +285,9 @@ function Posts() {
                           Price
                         </label>
                         <input
-                          type="text"
+                          type="number"
                           name="price"
                           value={formData.price}
-                          placeholder="Price"
                           onChange={handleInputChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
@@ -299,25 +299,45 @@ function Posts() {
                         <textarea
                           name="content"
                           value={formData.content}
-                          placeholder="Content"
                           onChange={handleInputChange}
-                          rows="4"
-                          className="w-full px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         ></textarea>
                       </div>
-                      <div className="flex items-center justify-end space-x-2 -mt-2">
-                        <button
-                          type="submit"
-                          className="bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          Save
-                        </button>
+                      <div className="mb-4">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="image">
+                          Image
+                        </label>
+                        <input
+                          type="file"
+                          name="image"
+                          onChange={handleInputChange}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="pdf">
+                          PDF
+                        </label>
+                        <input
+                          type="file"
+                          name="pdf"
+                          onChange={handleInputChange}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="flex justify-end">
                         <button
                           type="button"
                           onClick={cancelEditMode}
-                          className="bg-gray-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg mr-2"
                         >
                           Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                        >
+                          Save
                         </button>
                       </div>
                     </form>
@@ -326,53 +346,110 @@ function Posts() {
                       <img
                         src={selectedPost.image}
                         alt="Post Thumbnail"
-                        className="w-full h-64 object-cover rounded-lg mb-4"
+                        className="w-full h-64 object-fit rounded-lg mb-4"
                       />
-                      <h3 className="text-xl font-semibold text-gray-800 mb-2">{selectedPost.title}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{selectedPost.author}</p>
-                      <p className="text-xl font-bold text-gray-800 mb-4">${selectedPost.price}</p>
-                      <p className="text-gray-700">{showFullDescription ? selectedPost.content : `${selectedPost.content.slice(0, 100)}...`}</p>
-                      <button
-                        onClick={toggleDescription}
-                        className="text-blue-500 hover:underline"
-                      >
-                        {showFullDescription ? "Show Less" : "Show More"}
-                      </button>
-                      {selectedPost && (
-  <div>
-    {selectedPost.pdf ? (
-      <a
-        href={`${backendURL}/${selectedPost.pdf}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-4 inline-block text-blue-500 hover:underline"
-      >
-        View PDF
-      </a>
-    ) : (
-      <p>No PDF available</p>
-    )}
-  </div>
-)}
+                      <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                        {selectedPost.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-2">
+                        <strong>Author:</strong> {selectedPost.author}
+                      </p>
+                      <p className="text-xl font-bold text-gray-800 mb-4">
+                        ${selectedPost.price}
+                      </p>
+                      <p className="text-gray-700 mb-4">
+                        {showFullDescription
+                          ? selectedPost.content
+                          : selectedPost.content.slice(0, 100) + "..."}
+                        {selectedPost.content.length > 100 && (
+                          <button
+                            className="text-blue-500 ml-2 focus:outline-none"
+                            onClick={toggleDescription}
+                          >
+                            {showFullDescription ? "Show Less" : "Show More"}
+                          </button>
+                        )}
+                      </p>
 
-                      <div className="mt-6 flex items-end justify-end space-x-2">
-                        <button
-                          onClick={toggleEditMode}
-                          className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeletePost(selectedPost.id)}
-                          className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      {/* PDF Download & View Button */}
+                      {selectedPost.pdf && (
+                        <div className="flex space-x-4">
+                          <a
+                            href={selectedPost.pdf}
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block px-4 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-500"
+                          >
+                            Download PDF
+                          </a>
+                          <button
+                            onClick={openPdfModal}
+                            className="inline-block px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-500"
+                          >
+                            View PDF
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
+
+                <div className="bg-gray-100 p-4 flex justify-end">
+                  {!editMode && (
+                    <>
+                      <button
+                        onClick={toggleEditMode}
+                        className="px-4 py-2 bg-yellow-500 text-white rounded-lg mr-2"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeletePost(selectedPost.id)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
+
+              {/* PDF Viewer Modal */}
+              {isPdfModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                  <div className="bg-white w-full max-w-3xl mx-4 rounded-lg shadow-lg overflow-hidden">
+                    <div className="bg-gray-800 text-white p-4 flex items-center justify-between">
+                      <h2 className="text-lg font-semibold">PDF Viewer</h2>
+                      <button onClick={() => setIsPdfModalOpen(false)}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          className="w-6 h-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div className="p-4 h-96 overflow-y-auto">
+                      <Worker workerUrl={`https://unpkg.com/pdfjs-dist@2.6.347/build/pdf.worker.min.js`}>
+                        <Viewer
+                          fileUrl={selectedPost.pdf}
+                          plugins={[defaultLayoutPluginInstance]}
+                        />
+                      </Worker>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -1,72 +1,65 @@
 import React, { useState } from "react";
 import axios from "axios";
+import logo from '../../assets/logo.png'
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 import backendURL from "../../api/axios";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { useAuth } from './AuthContext'; // Import useAuth
-import { useSpring, animated } from '@react-spring/web'; // Import react-spring
+import { useAuth } from './AuthContext'; 
+import { useSpring, animated } from '@react-spring/web'; 
 
 const API_ENDPOINTS = {
   Login: "/api/auth/login",
 };
+
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(""); // State for success message
-  const { login } = useAuth(); // Get login function from AuthContext
+  const [success, setSuccess] = useState("");
+  const { login } = useAuth(); 
   const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.post(backendURL + API_ENDPOINTS.Login, {
         email,
         password,
       });
-      console.log("Login successful:", response.data);
-      
-      // Assuming the token is received in response.data.token
-      login(response.data.token); // Call login function from AuthContext
-      setSuccess("Login successful! Redirecting to dashboard..."); // Set success message
+      login(response.data.token);
+      setSuccess("Login successful! Redirecting...");
       setTimeout(() => {
-        navigate("/dashboard"); // Redirect to dashboard after a short delay
-      }, 2000); // Adjust the delay as needed
+        navigate("/dashboard");
+      }, 1500);
     } catch (error) {
-      console.error("Login failed:", error);
-      if (error.response && error.response.status === 401) {
-        setError("Invalid email or password");
-      } else {
-        setError("An error occurred. Please try again later.");
-      }
+      setError(error.response?.status === 401 ? "Invalid email or password" : "An error occurred. Please try again later.");
     }
   };
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
     setError("");
-    setSuccess(""); // Clear success message when email changes
+    setSuccess("");
   };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
     setError("");
-    setSuccess(""); // Clear success message when password changes
+    setSuccess("");
   };
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  // Animation for success and error messages
-const successSpring = useSpring({
-  opacity: success ? 1 : 0,
-  transform: success ? 'translateY(0)' : 'translateY(-20px)',
-  config: { tension: 170, friction: 26 },
-});
-
+  // Animations for success and error messages
+  const successSpring = useSpring({
+    opacity: success ? 1 : 0,
+    transform: success ? 'scale(1) rotate(0deg)' : 'scale(0.5) rotate(-10deg)',
+    config: { tension: 170, friction: 26 },
+  });
 
   const errorSpring = useSpring({
     opacity: error ? 1 : 0,
@@ -75,94 +68,109 @@ const successSpring = useSpring({
   });
 
   return (
-    <div>
+    <>
       <Navbar />
-      <div className="font-[sans-serif] text-[#333] relative">
-        <div className="lg:my-10 flex flex-col items-center justify-center relative">
-          {error && (
-            <animated.p style={errorSpring} className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md">
-              {error}
-            </animated.p>
-          )}
-          {success && (
-            <animated.p style={successSpring} className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-md">
-              {success}
-            </animated.p>
-          )}
-          <div className="grid md:grid-cols-1 items-center gap-4 max-w-3xl w-[27rem] lg:w-[30rem] lg:h-[40rem] lg:mb-24 p-4 m-4 shadow-2xl rounded-md">
-            <div className="md:max-w-md w-full sm:px-6 py-4">
-              <form onSubmit={handleSubmit}>
-                <div className="mb-12">
-                  <h3 className="text-3xl font-extrabold">Sign in</h3>
-                  <p className="text-sm mt-4">
-                    Don't have an account{" "}
-                    <a
-                      href="/register"
-                      className="text-black font-semibold hover:underline ml-1 whitespace-nowrap"
-                    >
-                      Register here
-                    </a>
-                  </p>
-                </div>
-                <div>
-                  <label className="text-xs block mb-2">Email</label>
-                  <div className="relative flex items-center">
-                    <input
-                      name="email"
-                      type="text"
-                      required
-                      value={email}
-                      onChange={handleEmailChange}
-                      className="w-full text-sm border-b border-gray-300 focus:border-[#333] px-2 py-3 outline-none"
-                      placeholder="Enter email"
-                    />
-                  </div>
-                </div>
-                <div className="mt-8">
-                  <label className="text-xs block mb-2">Password</label>
-                  <div className="relative flex items-center">
-                    <input
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      required
-                      value={password}
-                      onChange={handlePasswordChange}
-                      className="w-full text-sm border-b border-gray-300 focus:border-[#333] px-2 py-3 outline-none"
-                      placeholder="Enter password"
-                    />
-                    <button
-                      type="button"
-                      onClick={toggleShowPassword}
-                      className="absolute right-2 top-4 text-xl text-gray-600 hover:text-gray-900"
-                    >
-                      {showPassword ? <AiFillEye /> : <AiFillEyeInvisible />}
-                    </button>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between gap-2 mt-5">
-                  <div>
-                    <a
-                      href="www.forget.com"
-                      className="text-black font-semibold text-sm hover:underline"
-                    >
-                      Forgot Password?
-                    </a>
-                  </div>
-                </div>
-                <div className="mt-12">
-                  <button
-                    type="submit"
-                    className="w-full border shadow-xl py-2.5 px-4 text-sm font-semibold rounded-sm text-white bg-[#000] hover:bg-white hover:text-black focus:outline-none hover:border-black"
-                  >
-                    Login
-                  </button>
-                </div>
-              </form>
+      <div className="font-[sans-serif] text-[#333] -my-10 relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-200 to-purple-300">
+        {error && (
+          <animated.div
+            style={errorSpring}
+            className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-lg px-6 py-3 rounded-md shadow-2xl z-50 flex items-center justify-center"
+          >
+            {error}
+          </animated.div>
+        )}
+        {success && (
+          <animated.div
+            style={successSpring}
+            className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-green-400 to-teal-500 text-white text-lg px-6 py-3 rounded-md shadow-2xl z-50 flex items-center justify-center"
+          >
+            <div className="flex items-center">
+              <div className="animate-pulse">
+                <svg
+                  className="w-6 h-6 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2l4 -4"
+                  ></path>
+                </svg>
+              </div>
+              <span>{success}</span>
             </div>
-          </div>
+          </animated.div>
+        )}
+        <div className="bg-white h-[44rem]  rounded-lg shadow-2xl p-10 max-w-lg -my-10 w-full mx-auto transform transition-transform duration-500">
+          <h3 className="text-4xl font-bold text-center text-gray-800 mb-8">
+            <img src={logo} alt="logo" className="w-24 mx-40" />
+          </h3>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-6">
+              <label className="text-sm font-semibold text-gray-700 block mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={handleEmailChange}
+                required
+                className="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-150"
+                placeholder="Enter your email"
+              />
+            </div>
+            <div className="mb-6">
+              <label className="text-sm font-semibold text-gray-700 block mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={handlePasswordChange}
+                  required
+                  className="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-150"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  onClick={toggleShowPassword}
+                  className="absolute right-2 top-2 text-xl text-gray-500 hover:text-gray-700 transition duration-150"
+                >
+                  {showPassword ? <AiFillEye /> : <AiFillEyeInvisible />}
+                </button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center mb-6">
+              <a
+                href="/forgot-password"
+                className="text-sm font-medium text-blue-600 hover:underline"
+              >
+                Forgot Password?
+              </a>
+            </div>
+            <div>
+              <button
+                type="submit"
+                className="w-full py-3 px-6 bg-gradient-to-r  from-indigo-700 to-indigo-900 text-white font-bold rounded-md shadow-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
+              >
+                Sign In
+              </button>
+            </div>
+          </form>
+          <p className="mt-6 text-center text-sm text-gray-600">
+            Don’t have an account?{" "}
+            <a href="/register" className="text-blue-600 hover:underline">
+              Sign up here
+            </a>
+          </p>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

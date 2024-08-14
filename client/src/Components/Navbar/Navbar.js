@@ -23,9 +23,9 @@ function Navbar() {
   }, []);
 
   return (
-    <div>
+    <div className=''>
       <header
-        className={`shadow-md -py-1 px-4 sm:px-10 sticky bg-white font-[sans-serif] min-h-[70px] lg:z-50 ${
+        className={`shadow-md -py-1 px-4 sm:px-10 sticky  bg-white font-[sans-serif] min-h-[70px] lg:z-50 ${
           isScrolled ? 'fixed top-0 left-0 right-0 z-50' : ''
         }`}
       >

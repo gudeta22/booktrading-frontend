@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import backendURL from "../../api/axios";
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import '@react-pdf-viewer/core/lib/styles/index.css';
 
 const API_ENDPOINTS = {
   CREATE_POST: "/api/posts/create",
@@ -15,7 +17,7 @@ function CreatePosts() {
     pdf: null,
     content: "",
   });
-  
+
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -143,7 +145,7 @@ function CreatePosts() {
             {formData.image ? (
               <img
                 src={URL.createObjectURL(formData.image)}
-                alt="Image Preview"
+                alt="Img"
                 className="w-full h-full object-contain rounded-md"
               />
             ) : (
@@ -157,7 +159,7 @@ function CreatePosts() {
           {/* PDF Upload */}
           <label
             htmlFor="pdf"
-            className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+            className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
           >
             <input
               type="file"
@@ -179,6 +181,7 @@ function CreatePosts() {
             )}
           </label>
         </div>
+
         <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
           <input
             type="text"
@@ -223,6 +226,18 @@ function CreatePosts() {
             Submit
           </button>
         </form>
+
+        {/* Display the uploaded PDF */}
+        {formData.pdf && (
+          <div className="mt-10 p-4 border rounded-lg bg-white shadow-md">
+            <h3 className="text-xl font-semibold mb-4">PDF Preview</h3>
+            <div className="pdf-viewer" style={{ height: '750px' }}>
+              <Worker workerUrl={`https://unpkg.com/pdfjs-dist@latest/build/pdf.worker.min.js`}>
+                <Viewer fileUrl={URL.createObjectURL(formData.pdf)} />
+              </Worker>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
